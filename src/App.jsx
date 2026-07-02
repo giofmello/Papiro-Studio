@@ -241,7 +241,9 @@ function getStorage(key, fallback) {
 }
 
 export default function App() {
-  const [nome, setNome] = useState(localStorage.getItem("papiro_nome") || "");
+  const [nomeUsuario, setNomeUsuario] = useState(
+  localStorage.getItem("papiro_nome") || ""
+);
   const [page, setPage] = useState("inicio");
   const [mes, setMes] = useState("Julho");
   const [clientes, setClientes] = useState(() => getStorage("papiro_clientes", []));
@@ -273,13 +275,15 @@ const templatesFiltrados = templates.filter(([categoria, nome]) => {
   return categoriaOk && buscaOk;
 });
   function entrar(e) {
-    e.preventDefault();
-    if (!nome.trim()) return;
-    localStorage.setItem("papiro_nome", nome.trim());
-    setNome(nome.trim());
-  }
+  e.preventDefault();
 
-  if (!localStorage.getItem("papiro_nome")) {
+  if (!nome.trim()) return;
+
+  localStorage.setItem("papiro_nome", nome.trim());
+  setNomeUsuario(nome.trim());
+}
+
+  if (!nomeUsuario) {
     return (
       <main className="welcome">
         <section className="welcome-card">
@@ -309,7 +313,7 @@ const templatesFiltrados = templates.filter(([categoria, nome]) => {
         </div>
 
         <div className="user">
-          <strong>Olá, {localStorage.getItem("papiro_nome")} 🌸</strong>
+          <strong>Olá, {nomeUsuario} 🌸</strong>
           <span>Equipe Papiro</span>
         </div>
 
@@ -333,7 +337,7 @@ const templatesFiltrados = templates.filter(([categoria, nome]) => {
       <main className="content">
         {page === "inicio" && (
           <>
-            <Header title={`Olá, ${localStorage.getItem("papiro_nome")} 📜`} text="Hoje é um ótimo dia para criar algo bonito." />
+            <Header title={`Olá, ${nomeUsuario} 📜`} text="Hoje é um ótimo dia para criar algo bonito." />
             <div className="metrics">
               <Metric label="Clientes" value={clientes.length} />
               <Metric label="Produtos" value={estoque.length} />
