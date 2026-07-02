@@ -244,6 +244,7 @@ export default function App() {
   const [nomeUsuario, setNomeUsuario] = useState(
   localStorage.getItem("papiro_nome") || ""
 );
+const [nome, setNome] = useState("");
   const [page, setPage] = useState("inicio");
   const [mes, setMes] = useState("Julho");
   const [clientes, setClientes] = useState(() => getStorage("papiro_clientes", []));
@@ -274,7 +275,7 @@ const templatesFiltrados = templates.filter(([categoria, nome]) => {
 
   return categoriaOk && buscaOk;
 });
-  function entrar(e) {
+ function entrar(e) {
   e.preventDefault();
 
   if (!nome.trim()) return;
