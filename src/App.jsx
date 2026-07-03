@@ -108,58 +108,51 @@ const planejamento = {
   ],
 };
 const templates = [
-  ["Feed", "Post de Produto — Variação A"],
-  ["Feed", "Post de Produto — Variação B"],
-  ["Feed", "Post de Dica — Variação A"],
-  ["Feed", "Post de Dica — Variação B"],
-  ["Feed", "Novidade — Variação A"],
-  ["Feed", "Novidade — Variação B"],
-  ["Feed", "Lançamento de Produto — Variação A"],
-  ["Feed", "Lançamento de Produto — Variação B"],
-  ["Feed", "Promoção/Oferta — Variação A"],
-  ["Feed", "Promoção/Oferta — Variação B"],
-  ["Feed", "Bastidores — Variação A"],
-  ["Feed", "Bastidores — Variação B"],
-  ["Feed", "Avaliação de Cliente — Variação A"],
-  ["Feed", "Avaliação de Cliente — Variação B"],
-  ["Feed", "Comparativo — Variação A"],
-  ["Feed", "Comparativo — Variação B"],
-  ["Feed", "Frase Inspiradora — Variação A"],
-  ["Feed", "Frase Inspiradora — Variação B"],
-  ["Feed", "Institucional — Variação A"],
-  ["Feed", "Institucional — Variação B"],
-  ["Feed", "Coleção/Produto em uso — Variação A"],
-  ["Feed", "Coleção/Produto em uso — Variação B"],
+  { categoria: "Feed", nome: "Post de Produto — Variação A", canva: "https://canva.link/a2z1eo3argkesum" },
+  { categoria: "Feed", nome: "Post de Produto — Variação B", canva: "https://canva.link/anntffulvf13w8r" },
+  { categoria: "Feed", nome: "Post de Dica — Variação A", canva: "https://canva.link/q7has0qid08siva" },
+  { categoria: "Feed", nome: "Post de Dica — Variação B", canva: "https://canva.link/tdnnqrj3upvqppw" },
+  { categoria: "Feed", nome: "Novidade — Variação A", canva: "https://canva.link/xh17q8uyyd01d0u" },
+  { categoria: "Feed", nome: "Novidade — Variação B", canva: "https://canva.link/5lvuf17ws0oiv3c" },
+  { categoria: "Feed", nome: "Lançamento de Produto — Variação A", canva: "https://canva.link/mkp8ut9n9ikmx7o" },
+  { categoria: "Feed", nome: "Lançamento de Produto — Variação B", canva: "https://canva.link/4hdagheulrhqkxg" },
+  { categoria: "Feed", nome: "Promoção/Oferta — Variação A", canva: "https://canva.link/8kp5cy44htgkbji" },
+  { categoria: "Feed", nome: "Promoção/Oferta — Variação B", canva: "https://canva.link/bm3srvbxzslhgqt" },
+  { categoria: "Feed", nome: "Bastidores — Variação A", canva: "https://canva.link/44g4pipsyth4kvq" },
+  { categoria: "Feed", nome: "Bastidores — Variação B", canva: "https://canva.link/cjitkvc6mlb9kwe" },
+  { categoria: "Feed", nome: "Avaliação de Cliente — Variação A", canva: "https://canva.link/5m8pmk0ygh040iv" },
+  { categoria: "Feed", nome: "Avaliação de Cliente — Variação B", canva: "https://canva.link/udtlhnb1f439b0p" },
+  { categoria: "Feed", nome: "Comparativo — Variação A", canva: "https://canva.link/5c2zxv7da7wy291" },
+  { categoria: "Feed", nome: "Comparativo — Variação B", canva: "https://canva.link/2qjyv15knskqc78" },
+  { categoria: "Feed", nome: "Frase Inspiradora — Variação A", canva: "https://canva.link/lmz4p97u4u4uigo" },
+  { categoria: "Feed", nome: "Frase Inspiradora — Variação B", canva: "https://canva.link/etep8s323gojkvx" },
+  { categoria: "Feed", nome: "Capa de Reels — Variação A", canva: "https://canva.link/yyz6kc53tjt46oa" },
+  { categoria: "Feed", nome: "Capa de Reels — Variação B", canva: "https://canva.link/w4sehp0zwaolw1p" },
+  { categoria: "Feed", nome: "Carrossel Educativo — Variação A", canva: "https://canva.link/qjwssuvwrxb3k5y" },
+  { categoria: "Feed", nome: "Carrossel Produto — Variação B", canva: "https://canva.link/g9zjkmp7j8gj4s1" },
 
-  ["Stories", "Bom dia — Variação A"],
-  ["Stories", "Bom dia — Variação B"],
-  ["Stories", "Bastidores — Variação A"],
-  ["Stories", "Bastidores — Variação B"],
-  ["Stories", "Caixa de Perguntas — Variação A"],
-  ["Stories", "Caixa de Perguntas — Variação B"],
-  ["Stories", "Enquete — Variação A"],
-  ["Stories", "Enquete — Variação B"],
-  ["Stories", "Contagem Regressiva — Variação A"],
-  ["Stories", "Contagem Regressiva — Variação B"],
-  ["Stories", "Unboxing — Variação A"],
-  ["Stories", "Unboxing — Variação B"],
-  ["Stories", "Repost de Cliente — Variação A"],
-  ["Stories", "Repost de Cliente — Variação B"],
-  ["Stories", "Sexta de Novidade — Variação A"],
-  ["Stories", "Sexta de Novidade — Variação B"],
-  ["Stories", "Dica Rápida — Variação A"],
-  ["Stories", "Dica Rápida — Variação B"],
-  ["Stories", "Produto em Uso — Variação A"],
-  ["Stories", "Produto em Uso — Variação B"],
-  ["Stories", "Aviso/Comunicado — Variação A"],
-  ["Stories", "Aviso/Comunicado — Variação B"],
-
-  ["Destaques", "Nossa História"],
-  ["Destaques", "Produtos"],
-  ["Destaques", "Bastidores"],
-  ["Destaques", "Clientes"],
-  ["Destaques", "Dicas"],
-  ["Destaques", "Promoções"],
+  { categoria: "Stories", nome: "Bom dia — Variação A", canva: "https://canva.link/wp493r4jb888wwn" },
+  { categoria: "Stories", nome: "Bom dia — Variação B", canva: "https://canva.link/zi9dv8agmms10od" },
+  { categoria: "Stories", nome: "Bastidores — Variação A", canva: "https://canva.link/w1631auwmyb9sdw" },
+  { categoria: "Stories", nome: "Bastidores — Variação B", canva: "https://canva.link/4s5tf5075mzp8f4" },
+  { categoria: "Stories", nome: "Caixa de Perguntas — Variação A", canva: "https://canva.link/d3cgfe1y8cbhhqt" },
+  { categoria: "Stories", nome: "Caixa de Perguntas — Variação B", canva: "https://canva.link/47qzb0372cgj04e" },
+  { categoria: "Stories", nome: "Enquete — Variação A", canva: "https://canva.link/6e8jggl4pwp8tnp" },
+  { categoria: "Stories", nome: "Enquete — Variação B", canva: "https://canva.link/1n0vtbolmq1cuzo" },
+  { categoria: "Stories", nome: "Contagem Regressiva — Variação A", canva: "https://canva.link/sv2zcgq89a6cgij" },
+  { categoria: "Stories", nome: "Contagem Regressiva — Variação B", canva: "https://canva.link/swzwbl1otm0anmd" },
+  { categoria: "Stories", nome: "Oferta — Variação A", canva: "https://canva.link/m52ltjmjq57ww1f" },
+  { categoria: "Stories", nome: "Oferta — Variação B", canva: "https://canva.link/q9zgifkq876cdk8" },
+  { categoria: "Stories", nome: "Repost de Cliente — Variação A", canva: "https://canva.link/xvgcxv9btt03vn3" },
+  { categoria: "Stories", nome: "Repost de Cliente — Variação B", canva: "https://canva.link/w8g2mttz8htuhto" },
+  { categoria: "Stories", nome: "Making Of — Variação A", canva: "https://canva.link/5unm7bju5d1bhr3" },
+  { categoria: "Stories", nome: "Making Of — Variação B", canva: "https://canva.link/3ov0l7scu9krldt" },
+  { categoria: "Stories", nome: "Story Simples — Variação A", canva: "https://canva.link/5ob4c4a45ga5z00" },
+  { categoria: "Stories", nome: "Story Simples — Variação B", canva: "https://canva.link/ud2ryvggudo8brh" },
+  { categoria: "Stories", nome: "Vitrine — Variação A", canva: "https://canva.link/gkwxitleijz4zbp" },
+  { categoria: "Stories", nome: "Vitrine — Variação B", canva: "https://canva.link/kktk1q9fmjqcv7v" },
+  { categoria: "Stories", nome: "Story em Vídeo — Variação A", canva: "https://canva.link/wjkk8m4nd4pu7y8" },
+  { categoria: "Stories", nome: "Story em Vídeo — Variação B", canva: "https://canva.link/whlqsalcosfgzig" },
 ];
 const roteirosAtendimento = [
   {
@@ -264,12 +257,12 @@ useEffect(() => localStorage.setItem("papiro_clientes", JSON.stringify(clientes)
 
   const estoqueBaixo = estoque.filter((i) => Number(i.qtd) <= 3);
   const diasDoMes = planejamento[mes];
-const templatesFiltrados = templates.filter(([categoria, nome]) => {
- 
+const templatesFiltrados = templates.filter((template) => {
   const categoriaOk =
-    categoriaTemplate === "Todos" || categoria === categoriaTemplate;
+    categoriaTemplate === "Todos" ||
+    template.categoria === categoriaTemplate;
 
-  const buscaOk = nome
+  const buscaOk = template.nome
     .toLowerCase()
     .includes(buscaTemplate.toLowerCase());
 
@@ -509,7 +502,6 @@ const valorPix = Number(item.venda || 0) * 0.9;
     />
 
     <div className="template-toolbar">
-
       <input
         type="text"
         placeholder="🔍 Procurar template..."
@@ -524,26 +516,18 @@ const valorPix = Number(item.venda || 0) * 0.9;
         <option>Todos</option>
         <option>Feed</option>
         <option>Stories</option>
-        <option>Destaques</option>
       </select>
-
     </div>
 
     <div className="metrics">
-
       <Metric
         label="Feed"
-        value={templates.filter(t => t[0] === "Feed").length}
+        value={templates.filter((t) => t.categoria === "Feed").length}
       />
 
       <Metric
         label="Stories"
-        value={templates.filter(t => t[0] === "Stories").length}
-      />
-
-      <Metric
-        label="Destaques"
-        value={templates.filter(t => t[0] === "Destaques").length}
+        value={templates.filter((t) => t.categoria === "Stories").length}
       />
 
       <Metric
@@ -551,39 +535,47 @@ const valorPix = Number(item.venda || 0) * 0.9;
         value={templates.length}
       />
 
+      <Metric
+        label="Com link"
+        value={templates.filter((t) => t.canva).length}
+      />
     </div>
 
     <div className="grid">
-
-      {templatesFiltrados.map(([categoria, nome]) => (
-
+      {templatesFiltrados.map((template) => (
         <article
           className="template"
-          key={categoria + nome}
+          key={template.categoria + template.nome}
         >
-
           <div className="template-preview">
-            {categoria}
+            {template.categoria}
           </div>
 
           <span className="template-tag">
-            {categoria}
+            {template.categoria}
           </span>
 
-          <h3>{nome}</h3>
+          <h3>{template.nome}</h3>
 
           <p>
-            Template oficial da Papiro.
+            {template.canva
+              ? "Modelo do Canva cadastrado."
+              : "Link do Canva ainda não cadastrado."}
           </p>
 
-          <button>
+          <button
+            onClick={() => {
+              if (template.canva) {
+                window.open(template.canva, "_blank");
+              } else {
+                alert("Link do Canva ainda não cadastrado.");
+              }
+            }}
+          >
             🎨 Abrir Canva
           </button>
-
         </article>
-
       ))}
-
     </div>
   </>
 )}
