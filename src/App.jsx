@@ -108,51 +108,57 @@ const planejamento = {
   ],
 };
 const templates = [
-  { categoria: "Feed", nome: "Post de Produto — Variação A", canva: "https://canva.link/a2z1eo3argkesum" },
-  { categoria: "Feed", nome: "Post de Produto — Variação B", canva: "https://canva.link/anntffulvf13w8r" },
-  { categoria: "Feed", nome: "Post de Dica — Variação A", canva: "https://canva.link/q7has0qid08siva" },
-  { categoria: "Feed", nome: "Post de Dica — Variação B", canva: "https://canva.link/tdnnqrj3upvqppw" },
-  { categoria: "Feed", nome: "Novidade — Variação A", canva: "https://canva.link/xh17q8uyyd01d0u" },
-  { categoria: "Feed", nome: "Novidade — Variação B", canva: "https://canva.link/5lvuf17ws0oiv3c" },
-  { categoria: "Feed", nome: "Lançamento de Produto — Variação A", canva: "https://canva.link/mkp8ut9n9ikmx7o" },
-  { categoria: "Feed", nome: "Lançamento de Produto — Variação B", canva: "https://canva.link/4hdagheulrhqkxg" },
-  { categoria: "Feed", nome: "Promoção/Oferta — Variação A", canva: "https://canva.link/8kp5cy44htgkbji" },
-  { categoria: "Feed", nome: "Promoção/Oferta — Variação B", canva: "https://canva.link/bm3srvbxzslhgqt" },
-  { categoria: "Feed", nome: "Bastidores — Variação A", canva: "https://canva.link/44g4pipsyth4kvq" },
-  { categoria: "Feed", nome: "Bastidores — Variação B", canva: "https://canva.link/cjitkvc6mlb9kwe" },
-  { categoria: "Feed", nome: "Avaliação de Cliente — Variação A", canva: "https://canva.link/5m8pmk0ygh040iv" },
-  { categoria: "Feed", nome: "Avaliação de Cliente — Variação B", canva: "https://canva.link/udtlhnb1f439b0p" },
-  { categoria: "Feed", nome: "Comparativo — Variação A", canva: "https://canva.link/5c2zxv7da7wy291" },
-  { categoria: "Feed", nome: "Comparativo — Variação B", canva: "https://canva.link/2qjyv15knskqc78" },
-  { categoria: "Feed", nome: "Frase Inspiradora — Variação A", canva: "https://canva.link/lmz4p97u4u4uigo" },
-  { categoria: "Feed", nome: "Frase Inspiradora — Variação B", canva: "https://canva.link/etep8s323gojkvx" },
-  { categoria: "Feed", nome: "Capa de Reels — Variação A", canva: "https://canva.link/yyz6kc53tjt46oa" },
-  { categoria: "Feed", nome: "Capa de Reels — Variação B", canva: "https://canva.link/w4sehp0zwaolw1p" },
-  { categoria: "Feed", nome: "Carrossel Educativo — Variação A", canva: "https://canva.link/qjwssuvwrxb3k5y" },
-  { categoria: "Feed", nome: "Carrossel Produto — Variação B", canva: "https://canva.link/g9zjkmp7j8gj4s1" },
+  { categoria: "Feed", nome: "Post de Produto — Variação A", canva: "https://canva.link/a2z1eo3argkesum", preview: "/previews/4_POST DE PRODUTO A.png" },
+  { categoria: "Feed", nome: "Post de Produto — Variação B", canva: "https://canva.link/anntffulvf13w8r", preview: "/previews/39_POST DE PRODUTO B.png" },
+  { categoria: "Feed", nome: "Post de Dica — Variação A", canva: "https://canva.link/q7has0qid08siva", preview: "/previews/13_POST DE DICA A.png" },
+  { categoria: "Feed", nome: "Post de Dica — Variação B", canva: "https://canva.link/tdnnqrj3upvqppw", preview: "/previews/41_POST DE PRODUTO B.png" },
+  { categoria: "Feed", nome: "Novidade — Variação A", canva: "https://canva.link/xh17q8uyyd01d0u", preview: "/previews/40_NOVIDADE A.png" },
+  { categoria: "Feed", nome: "Novidade — Variação B", canva: "https://canva.link/5lvuf17ws0oiv3c", preview: "/previews/7_NOVIDADE B.png" },
+  { categoria: "Feed", nome: "Lançamento de Produto — Variação A", canva: "https://canva.link/mkp8ut9n9ikmx7o", preview: "/previews/26_LANÇAMENTO A.png" },
+  { categoria: "Feed", nome: "Lançamento de Produto — Variação B", canva: "https://canva.link/4hdagheulrhqkxg",preview: "/previews/24_LANÇAMENTO B.png" },
+  { categoria: "Feed", nome: "Promoção/Oferta — Variação A", canva: "https://canva.link/8kp5cy44htgkbji", preview: "/previews/38_PROMOÇÃO A.png" },
+  { categoria: "Feed", nome: "Promoção/Oferta — Variação B", canva: "https://canva.link/bm3srvbxzslhgqt", preview: "/previews/42_PROMOÇÃO B.png" },
+  { categoria: "Feed", nome: "Bastidores — Variação A", canva: "https://canva.link/44g4pipsyth4kvq",preview: "/previews/10_BASTIDORES A.png" },
+  { categoria: "Feed", nome: "Bastidores — Variação B", canva: "https://canva.link/cjitkvc6mlb9kwe",preview: "/previews/23_BASTIDORES B.png" },
+  { categoria: "Feed", nome: "Avaliação de Cliente — Variação A", canva: "https://canva.link/5m8pmk0ygh040iv", preview: "/previews/3_AVALIAÇÃO A.png" },
+  { categoria: "Feed", nome: "Avaliação de Cliente — Variação B", canva: "https://canva.link/udtlhnb1f439b0p", preview: "/previews/43_AVALIAÇÃO B.png" },
+  { categoria: "Feed", nome: "Comparativo — Variação A", canva: "https://canva.link/5c2zxv7da7wy291", preview: "/previews/34_COMPARAÇÃO A.png" },
+  { categoria: "Feed", nome: "Comparativo — Variação B", canva: "https://canva.link/2qjyv15knskqc78", preview: "/previews/12_Comparação B.png" },
+  { categoria: "Feed", nome: "Frase Inspiradora — Variação A", canva: "https://canva.link/lmz4p97u4u4uigo", preview: "/previews/31_FRASE A.png" },
+  { categoria: "Feed", nome: "Frase Inspiradora — Variação B", canva: "https://canva.link/etep8s323gojkvx", preview: "/previews/35_FRASE B.png" },
+  { categoria: "Feed", nome: "Capa de Reels — Variação A", canva: "https://canva.link/yyz6kc53tjt46oa", preview: "/previews/15_CAPA DE REELS A.png" },
+  { categoria: "Feed", nome: "Capa de Reels — Variação B", canva: "https://canva.link/w4sehp0zwaolw1p", preview: "/previews/11_CAPA DE REELS B.png" },
+  { categoria: "Feed", nome: "Carrossel Educativo — Variação A", canva: "https://canva.link/qjwssuvwrxb3k5y", preview: "/previews/1.png" },
+  { categoria: "Feed", nome: "Carrossel Produto — Variação B", canva: "https://canva.link/g9zjkmp7j8gj4s1", preview: "/previews/11.png" },
 
-  { categoria: "Stories", nome: "Bom dia — Variação A", canva: "https://canva.link/wp493r4jb888wwn" },
-  { categoria: "Stories", nome: "Bom dia — Variação B", canva: "https://canva.link/zi9dv8agmms10od" },
-  { categoria: "Stories", nome: "Bastidores — Variação A", canva: "https://canva.link/w1631auwmyb9sdw" },
-  { categoria: "Stories", nome: "Bastidores — Variação B", canva: "https://canva.link/4s5tf5075mzp8f4" },
-  { categoria: "Stories", nome: "Caixa de Perguntas — Variação A", canva: "https://canva.link/d3cgfe1y8cbhhqt" },
-  { categoria: "Stories", nome: "Caixa de Perguntas — Variação B", canva: "https://canva.link/47qzb0372cgj04e" },
-  { categoria: "Stories", nome: "Enquete — Variação A", canva: "https://canva.link/6e8jggl4pwp8tnp" },
-  { categoria: "Stories", nome: "Enquete — Variação B", canva: "https://canva.link/1n0vtbolmq1cuzo" },
-  { categoria: "Stories", nome: "Contagem Regressiva — Variação A", canva: "https://canva.link/sv2zcgq89a6cgij" },
-  { categoria: "Stories", nome: "Contagem Regressiva — Variação B", canva: "https://canva.link/swzwbl1otm0anmd" },
-  { categoria: "Stories", nome: "Oferta — Variação A", canva: "https://canva.link/m52ltjmjq57ww1f" },
-  { categoria: "Stories", nome: "Oferta — Variação B", canva: "https://canva.link/q9zgifkq876cdk8" },
-  { categoria: "Stories", nome: "Repost de Cliente — Variação A", canva: "https://canva.link/xvgcxv9btt03vn3" },
-  { categoria: "Stories", nome: "Repost de Cliente — Variação B", canva: "https://canva.link/w8g2mttz8htuhto" },
-  { categoria: "Stories", nome: "Making Of — Variação A", canva: "https://canva.link/5unm7bju5d1bhr3" },
-  { categoria: "Stories", nome: "Making Of — Variação B", canva: "https://canva.link/3ov0l7scu9krldt" },
-  { categoria: "Stories", nome: "Story Simples — Variação A", canva: "https://canva.link/5ob4c4a45ga5z00" },
-  { categoria: "Stories", nome: "Story Simples — Variação B", canva: "https://canva.link/ud2ryvggudo8brh" },
-  { categoria: "Stories", nome: "Vitrine — Variação A", canva: "https://canva.link/gkwxitleijz4zbp" },
-  { categoria: "Stories", nome: "Vitrine — Variação B", canva: "https://canva.link/kktk1q9fmjqcv7v" },
-  { categoria: "Stories", nome: "Story em Vídeo — Variação A", canva: "https://canva.link/wjkk8m4nd4pu7y8" },
-  { categoria: "Stories", nome: "Story em Vídeo — Variação B", canva: "https://canva.link/whlqsalcosfgzig" },
+  { categoria: "Stories", nome: "Bom dia — Variação A", canva: "https://canva.link/wp493r4jb888wwn", preview: "/previews/37_STORY BOM DIA A.png" },
+  { categoria: "Stories", nome: "Bom dia — Variação B", canva: "https://canva.link/zi9dv8agmms10od", preview: "/previews/17_STORY BOM DIA B.png" },
+  { categoria: "Stories", nome: "Bastidores — Variação A", canva: "https://canva.link/w1631auwmyb9sdw", preview: "/previews/27_STORY BASTIDORES A.png" },
+  { categoria: "Stories", nome: "Bastidores — Variação B", canva: "https://canva.link/4s5tf5075mzp8f4", preview: "/previews/6_STORY BASTIDORES B.png" },
+  { categoria: "Stories", nome: "Caixa de Perguntas — Variação A", canva: "https://canva.link/d3cgfe1y8cbhhqt", preview: "/previews/19_CAIXA DE PERGUNTAS A.png" },
+  { categoria: "Stories", nome: "Caixa de Perguntas — Variação B", canva: "https://canva.link/47qzb0372cgj04e", preview: "/previews/20_CAIXA DE PERGUNTAS B.png" },
+  { categoria: "Stories", nome: "Enquete — Variação A", canva: "https://canva.link/6e8jggl4pwp8tnp", preview: "/previews/32_STORY ENQUETE A.png" },
+  { categoria: "Stories", nome: "Enquete — Variação B", canva: "https://canva.link/1n0vtbolmq1cuzo", preview: "/previews/21_STORY ENQUETE B.png" },
+  { categoria: "Stories", nome: "Contagem Regressiva — Variação A", canva: "https://canva.link/sv2zcgq89a6cgij", preview: "/previews/29_STORY CONTAGEM REGRESSIVA A.png" },
+  { categoria: "Stories", nome: "Contagem Regressiva — Variação B", canva: "https://canva.link/swzwbl1otm0anmd", preview: "/previews/8_STORY CONTAGEM REGRESSIVA B.png" },
+  { categoria: "Stories", nome: "Oferta — Variação A", canva: "https://canva.link/m52ltjmjq57ww1f", preview: "/previews/1_STORY OFERTA A.png" },
+  { categoria: "Stories", nome: "Oferta — Variação B", canva: "https://canva.link/q9zgifkq876cdk8", preview: "/previews/30_STORY OFERTA B.png" },
+  { categoria: "Stories", nome: "Repost de Cliente — Variação A", canva: "https://canva.link/xvgcxv9btt03vn3", preview: "/previews/25_STORY REPOST A.png" },
+  { categoria: "Stories", nome: "Repost de Cliente — Variação B", canva: "https://canva.link/w8g2mttz8htuhto", preview: "/previews/5_STORY REPOST B.png" },
+  { categoria: "Stories", nome: "Making Of — Variação A", canva: "https://canva.link/5unm7bju5d1bhr3", preview: "/previews/28_STORY MAKING OF A.png" },
+  { categoria: "Stories", nome: "Making Of — Variação B", canva: "https://canva.link/3ov0l7scu9krldt", preview: "/previews/33_STORY MAKING OF B.png" },
+  { categoria: "Stories", nome: "Story Simples — Variação A", canva: "https://canva.link/5ob4c4a45ga5z00", preview: "/previews/36_STORY SIMPLES A.png" },
+  { categoria: "Stories", nome: "Story Simples — Variação B", canva: "https://canva.link/ud2ryvggudo8brh", preview: "/previews/18_STORY SIMPLES B.png" },
+  { categoria: "Stories", nome: "Vitrine — Variação A", canva: "https://canva.link/gkwxitleijz4zbp", preview: "/previews/16_STORY VITRINE A.png" },
+  { categoria: "Stories", nome: "Vitrine — Variação B", canva: "https://canva.link/kktk1q9fmjqcv7v", preview: "/previews/2_STORY VITRINE B.png" },
+  { categoria: "Stories", nome: "Story em Vídeo — Variação A", canva: "https://canva.link/wjkk8m4nd4pu7y8", preview: "/previews/14_STORY EM VÍDEO A.png" },
+  { categoria: "Stories", nome: "Story em Vídeo — Variação B", canva: "https://canva.link/whlqsalcosfgzig", preview: "/previews/22_STORY EM VÍDEO B.png"},
+];
+const usuariosSistema = [
+  { id: "giovanna", nome: "Giovanna" },
+  { id: "matheus", nome: "Matheus" },
+  { id: "victor", nome: "Victor" },
+  { id: "vitoria", nome: "Vitória" },
 ];
 const roteirosAtendimento = [
   {
@@ -235,8 +241,11 @@ function getStorage(key, fallback) {
 
 export default function App() {
   const [nomeUsuario, setNomeUsuario] = useState(
-  localStorage.getItem("papiro_nome") || ""
+  localStorage.getItem("papiro_usuario_nome") || ""
 );
+const [loginUser, setLoginUser] = useState("");
+const [loginSenha, setLoginSenha] = useState("");
+const [loginErro, setLoginErro] = useState("");
 const [nome, setNome] = useState("");
   const [page, setPage] = useState("inicio");
   const [mes, setMes] = useState("Julho");
@@ -271,27 +280,87 @@ const templatesFiltrados = templates.filter((template) => {
  function entrar(e) {
   e.preventDefault();
 
-  if (!nome.trim()) return;
+  const usuario = usuariosSistema.find((u) => u.id === loginUser);
 
-  localStorage.setItem("papiro_nome", nome.trim());
-  setNomeUsuario(nome.trim());
+  if (!usuario) {
+    setLoginErro("Usuário inválido.");
+    return;
+  }
+
+  if (!loginSenha.trim()) {
+    setLoginErro("Digite uma senha.");
+    return;
+  }
+
+  const chaveSenha = `papiro_senha_${usuario.id}`;
+  const senhaSalva = localStorage.getItem(chaveSenha);
+
+  if (!senhaSalva) {
+    localStorage.setItem(chaveSenha, loginSenha.trim());
+    localStorage.setItem("papiro_usuario_id", usuario.id);
+    localStorage.setItem("papiro_usuario_nome", usuario.nome);
+    setNomeUsuario(usuario.nome);
+    setLoginErro("");
+    return;
+  }
+
+  if (senhaSalva !== loginSenha.trim()) {
+    setLoginErro("Senha incorreta.");
+    return;
+  }
+
+  localStorage.setItem("papiro_usuario_id", usuario.id);
+  localStorage.setItem("papiro_usuario_nome", usuario.nome);
+  setNomeUsuario(usuario.nome);
+  setLoginErro("");
 }
 
-  if (!nomeUsuario) {
-    return (
-      <main className="welcome">
-        <section className="welcome-card">
-          <div className="papiro-icon">📜</div>
-          <h1>Papiro Studio</h1>
-          <p>Como posso te chamar?</p>
-          <form onSubmit={entrar}>
-            <input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Seu nome" />
-            <button>Entrar</button>
-          </form>
-        </section>
-      </main>
-    );
-  }
+ if (!nomeUsuario) {
+  return (
+    <main className="welcome">
+      <section className="welcome-card">
+        <div className="papiro-icon">
+          <img src="/favicon.png" alt="Papiro" />
+        </div>
+
+        <h1>Papiro Studio</h1>
+        <p>Entre com seu usuário e senha.</p>
+
+        <form onSubmit={entrar}>
+          <select
+  value={loginUser}
+  onChange={(e) => setLoginUser(e.target.value)}
+>
+  <option value="" disabled>
+    Selecione seu usuário
+  </option>
+
+  {usuariosSistema.map((usuario) => (
+    <option key={usuario.id} value={usuario.id}>
+      {usuario.nome}
+    </option>
+  ))}
+</select>
+
+          <input
+            type="password"
+            value={loginSenha}
+            onChange={(e) => setLoginSenha(e.target.value)}
+            placeholder="Senha"
+          />
+
+          {loginErro && <p className="login-error">{loginErro}</p>}
+
+          <button>Entrar</button>
+        </form>
+
+        <small>
+          Primeiro acesso: digite uma senha para cadastrar.
+        </small>
+      </section>
+    </main>
+  );
+}
 
   return (
     <div className="app">
@@ -547,9 +616,16 @@ const valorPix = Number(item.venda || 0) * 0.9;
           className="template"
           key={template.categoria + template.nome}
         >
-          <div className="template-preview">
-            {template.categoria}
-          </div>
+         <div className="template-preview">
+  {template.preview ? (
+    <img
+      src={template.preview}
+      alt={`Prévia de ${template.nome}`}
+    />
+  ) : (
+    <span>{template.categoria}</span>
+  )}
+</div>
 
           <span className="template-tag">
             {template.categoria}
