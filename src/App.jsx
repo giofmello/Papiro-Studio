@@ -260,21 +260,58 @@ const [iaTema, setIaTema] = useState("");
 const [iaTom, setIaTom] = useState("fofo, acolhedor e comercial");
 const [iaDetalhes, setIaDetalhes] = useState("");
 
-useEffect(() => localStorage.setItem("papiro_clientes", JSON.stringify(clientes)), [clientes]);
-  useEffect(() => localStorage.setItem("papiro_estoque", JSON.stringify(estoque)), [estoque]);
-  useEffect(() => {
-  async function testarSupabase() {
-    const { data, error } = await supabase.from("clientes").select("*").limit(1);
+useEffect(() => {
+  async function carregarClientes() {
+    const { data, error } = await supabase
+      .from("clientes")
+      .select("*")
+      .order("id", { ascending: false });
 
     if (error) {
-      console.log("Erro Supabase:", error.message);
-    } else {
-      console.log("Supabase conectado:", data);
+      console.log("Erro ao carregar clientes:", error.message);
+      return;
     }
+
+    setClientes(data || []);
   }
 
-  testarSupabase();
+  carregarClientes();
 }, []);
+async function adicionarCliente(e) {
+  e.preventDefault();
+
+  if (!clientForm.nome.trim()) return;
+
+  const { data, error } = await supabase
+    .from("clientes")
+    .insert([clientForm])
+    .select();
+
+  if (error) {
+    alert("Erro ao salvar cliente.");
+    console.log(error.message);
+    return;
+  }
+
+  setClientes([data[0], ...clientes]);
+  setClientForm(emptyClient);
+}
+
+async function removerCliente(id) {
+  const { error } = await supabase
+    .from("clientes")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("Erro ao remover cliente.");
+    console.log(error.message);
+    return;
+  }
+
+  setClientes(clientes.filter((cliente) => cliente.id !== id));
+}
+  useEffect(() => localStorage.setItem("papiro_estoque", JSON.stringify(estoque)), [estoque]);
 
   const estoqueBaixo = estoque.filter((i) => Number(i.qtd) <= 3);
   const diasDoMes = planejamento[mes];
@@ -460,12 +497,7 @@ const templatesFiltrados = templates.filter((template) => {
         {page === "clientes" && (
           <>
             <Header title="Clientes" text="Cadastre contatos, Instagram e observações." />
-            <form className="form" onSubmit={(e) => {
-              e.preventDefault();
-              if (!clientForm.nome.trim()) return;
-              setClientes([...clientes, { ...clientForm, id: Date.now() }]);
-              setClientForm(emptyClient);
-            }}>
+           <form className="form" onSubmit={adicionarCliente}>
               <input placeholder="Nome" value={clientForm.nome} onChange={(e) => setClientForm({ ...clientForm, nome: e.target.value })} />
               <input placeholder="WhatsApp" value={clientForm.whatsapp} onChange={(e) => setClientForm({ ...clientForm, whatsapp: e.target.value })} />
               <input placeholder="Instagram" value={clientForm.instagram} onChange={(e) => setClientForm({ ...clientForm, instagram: e.target.value })} />
@@ -478,7 +510,7 @@ const templatesFiltrados = templates.filter((template) => {
               {clientes.map((c) => (
                 <Card key={c.id} title={c.nome} text={`WhatsApp: ${c.whatsapp || "—"} | Instagram: ${c.instagram || "—"} | Cidade: ${c.cidade || "—"}`}>
                   <p>{c.obs}</p>
-                  <button onClick={() => setClientes(clientes.filter((x) => x.id !== c.id))}>Remover</button>
+                  <button onClick={() => removerCliente(c.id)}>Remover</button>
                 </Card>
               ))}
             </div>
