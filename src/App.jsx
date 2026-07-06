@@ -315,7 +315,23 @@ async function removerCliente(id) {
 
   setClientes(clientes.filter((cliente) => cliente.id !== id));
 }
-  useEffect(() => localStorage.setItem("papiro_estoque", JSON.stringify(estoque)), [estoque]);
+  useEffect(() => {
+  async function carregarEstoque() {
+    const { data, error } = await supabase
+      .from("estoque")
+      .select("*")
+      .order("id", { ascending: false });
+
+    if (error) {
+      console.log("Erro ao carregar estoque:", error.message);
+      return;
+    }
+
+    setEstoque(data || []);
+  }
+
+  carregarEstoque();
+}, []);
 
   const estoqueBaixo = estoque.filter((i) => Number(i.qtd) <= 3);
   const diasDoMes = planejamento[mes];
@@ -414,7 +430,60 @@ const templatesFiltrados = templates.filter((template) => {
     </main>
   );
 }
+async function adicionarProduto() {
+  const novoProduto = {
+    codigo: "",
+    produto: "Novo produto",
+    categoria: "",
+    qtd: 0,
+    minimo: 3,
+    custo: 0,
+    venda: 0,
+  };
 
+  const { data, error } = await supabase
+    .from("estoque")
+    .insert([novoProduto])
+    .select();
+
+  if (error) {
+    alert("Erro ao adicionar produto: " + error.message);
+    return;
+  }
+
+  setEstoque([data[0], ...estoque]);
+}
+
+async function atualizarProdutoEstoque(id, campo, valor) {
+  setEstoque(
+    estoque.map((item) =>
+      item.id === id ? { ...item, [campo]: valor } : item
+    )
+  );
+
+  const { error } = await supabase
+    .from("estoque")
+    .update({ [campo]: valor })
+    .eq("id", id);
+
+  if (error) {
+    alert("Erro ao atualizar produto: " + error.message);
+  }
+}
+
+async function removerProdutoEstoque(id) {
+  const { error } = await supabase
+    .from("estoque")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("Erro ao remover produto: " + error.message);
+    return;
+  }
+
+  setEstoque(estoque.filter((item) => item.id !== id));
+}
   return (
     <div className="app">
       <aside className="sidebar">
@@ -530,25 +599,9 @@ const templatesFiltrados = templates.filter((template) => {
     <Header title="Estoque" text="Gerencie todos os produtos da Papiro." />
 
     <div className="stock-actions">
-      <button
-        onClick={() =>
-          setEstoque([
-            ...estoque,
-            {
-              id: Date.now(),
-              codigo: "",
-              produto: "",
-              categoria: "",
-              qtd: "",
-              minimo: "3",
-              custo: "",
-              venda: "",
-            },
-          ])
-        }
-      >
-        + Novo Produto
-      </button>
+      <button onClick={adicionarProduto}>
+  + Novo Produto
+</button>
     </div>
 
     <div className="stock-sheet">
@@ -571,13 +624,9 @@ const templatesFiltrados = templates.filter((template) => {
 const lucro = Number(item.venda || 0) - Number(item.custo || 0);
 const valorPix = Number(item.venda || 0) * 0.9;
 
-        const editar = (campo, valor) => {
-          setEstoque(
-            estoque.map((x) =>
-              x.id === item.id ? { ...x, [campo]: valor } : x
-            )
-          );
-        };
+      const editar = (campo, valor) => {
+  atualizarProdutoEstoque(item.id, campo, valor);
+};
 
         return (
           <div className="stock-sheet-row" key={item.id}>
@@ -605,9 +654,9 @@ const valorPix = Number(item.venda || 0) * 0.9;
               {baixo ? "🔴 Baixo" : "🟢 OK"}
             </span>
 
-            <button onClick={() => setEstoque(estoque.filter((x) => x.id !== item.id))}>
-              🗑️
-            </button>
+            <button onClick={() => removerProdutoEstoque(item.id)}>
+  🗑️
+</button>
           </div>
         );
       })}
