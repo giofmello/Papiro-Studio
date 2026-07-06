@@ -512,7 +512,11 @@ const templatesFiltrados = templates.filter((template) => {
             </form>
             <div className="grid">
               {clientes.map((c) => (
-                <Card key={c.id} title={c.nome} text={`WhatsApp: ${c.whatsapp || "—"} | Instagram: ${c.instagram || "—"} | Cidade: ${c.cidade || "—"}`}>
+                <Card
+  key={c.id}
+  title={c.nome}
+  text={`WhatsApp: ${c.whatsapp || "—"} | Instagram: ${c.instagram || "—"} | Cidade: ${c.cidade || "—"} | Aniversário: ${c.aniversario || "—"}`}
+>
                   <p>{c.obs}</p>
                   <button onClick={() => removerCliente(c.id)}>Remover</button>
                 </Card>
