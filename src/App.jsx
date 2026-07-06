@@ -282,21 +282,25 @@ async function adicionarCliente(e) {
 
   if (!clientForm.nome.trim()) return;
 
+  const clienteParaSalvar = {
+    ...clientForm,
+    aniversario: clientForm.aniversario || null,
+  };
+
   const { data, error } = await supabase
     .from("clientes")
-    .insert([clientForm])
+    .insert([clienteParaSalvar])
     .select();
 
   if (error) {
-    alert("Erro ao salvar cliente.");
-    console.log(error.message);
+    alert("Erro ao salvar cliente: " + error.message);
+    console.log("Erro completo:", error);
     return;
   }
 
   setClientes([data[0], ...clientes]);
   setClientForm(emptyClient);
 }
-
 async function removerCliente(id) {
   const { error } = await supabase
     .from("clientes")
