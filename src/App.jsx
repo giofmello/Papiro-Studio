@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import "./index.css";
-
+import { supabase } from "./supabase";
 const emptyClient = { nome: "", whatsapp: "", instagram: "", cidade: "", aniversario: "", obs: "" };
 const emptyStock = { produto: "", categoria: "", qtd: "", custo: "", venda: "" };
 
@@ -262,7 +262,19 @@ const [iaDetalhes, setIaDetalhes] = useState("");
 
 useEffect(() => localStorage.setItem("papiro_clientes", JSON.stringify(clientes)), [clientes]);
   useEffect(() => localStorage.setItem("papiro_estoque", JSON.stringify(estoque)), [estoque]);
-  
+  useEffect(() => {
+  async function testarSupabase() {
+    const { data, error } = await supabase.from("clientes").select("*").limit(1);
+
+    if (error) {
+      console.log("Erro Supabase:", error.message);
+    } else {
+      console.log("Supabase conectado:", data);
+    }
+  }
+
+  testarSupabase();
+}, []);
 
   const estoqueBaixo = estoque.filter((i) => Number(i.qtd) <= 3);
   const diasDoMes = planejamento[mes];
