@@ -507,6 +507,7 @@ async function removerProdutoEstoque(id) {
 </div>
 
 <button
+  type="button"
   className="logout-button"
   onClick={async () => {
     await supabase.auth.signOut();
@@ -519,7 +520,7 @@ async function removerProdutoEstoque(id) {
   Sair
 </button>
 
-        <nav>
+<nav>
           {[
             ["inicio", "Início"],
             ["planejamento", "Planejamento"],
