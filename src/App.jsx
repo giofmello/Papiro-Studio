@@ -155,10 +155,10 @@ const templates = [
   { categoria: "Stories", nome: "Story em Vídeo — Variação B", canva: "https://canva.link/whlqsalcosfgzig", preview: "/previews/story-em-video-b.png"},
 ];
 const usuariosSistema = [
-  { id: "giovanna", nome: "Giovanna" },
-  { id: "matheus", nome: "Matheus" },
-  { id: "victor", nome: "Victor" },
-  { id: "vitoria", nome: "Vitória" },
+  { id: "gio", nome: "Giovanna", email: "giovanna@papiro.local" },
+  { id: "matheus", nome: "Matheus", email: "matheus@papiro.local" },
+  { id: "victor", nome: "Victor", email: "victor@papiro.local" },
+  { id: "vitoria", nome: "Vitória", email: "vitoria@papiro.local" },
 ];
 const roteirosAtendimento = [
   {
@@ -246,6 +246,9 @@ export default function App() {
 const [loginUser, setLoginUser] = useState("");
 const [loginSenha, setLoginSenha] = useState("");
 const [loginErro, setLoginErro] = useState("");
+const [loginErro, setLoginErro] = useState("");
+const [loginCarregando, setLoginCarregando] = useState(false);
+const [nome, setNome] = useState("");
 const [nome, setNome] = useState("");
   const [page, setPage] = useState("inicio");
   const [mes, setMes] = useState("Julho");
@@ -346,37 +349,36 @@ const templatesFiltrados = templates.filter((template) => {
 
   return categoriaOk && buscaOk;
 });
- function entrar(e) {
+ async function entrar(e) {
   e.preventDefault();
+  setLoginErro("");
+  setLoginCarregando(true);
 
   const usuario = usuariosSistema.find((u) => u.id === loginUser);
 
   if (!usuario) {
-    setLoginErro("Usuário inválido.");
+    setLoginErro("Selecione seu usuário.");
+    setLoginCarregando(false);
     return;
   }
 
-  if (!loginSenha.trim()) {
-    setLoginErro("Digite uma senha.");
+  const { error } = await supabase.auth.signInWithPassword({
+    email: usuario.email,
+    password: loginSenha,
+  });
+
+  if (error) {
+    setLoginErro("Usuário ou senha incorretos.");
+    setLoginCarregando(false);
     return;
   }
 
-  const chaveSenha = `papiro_senha_${usuario.id}`;
-  const senhaSalva = localStorage.getItem(chaveSenha);
-
-  if (!senhaSalva) {
-    localStorage.setItem(chaveSenha, loginSenha.trim());
-    localStorage.setItem("papiro_usuario_id", usuario.id);
-    localStorage.setItem("papiro_usuario_nome", usuario.nome);
-    setNomeUsuario(usuario.nome);
-    setLoginErro("");
-    return;
-  }
-
-  if (senhaSalva !== loginSenha.trim()) {
-    setLoginErro("Senha incorreta.");
-    return;
-  }
+  localStorage.setItem("papiro_usuario_id", usuario.id);
+  localStorage.setItem("papiro_usuario_nome", usuario.nome);
+  setNomeUsuario(usuario.nome);
+  setLoginErro("");
+  setLoginCarregando(false);
+}
 
   localStorage.setItem("papiro_usuario_id", usuario.id);
   localStorage.setItem("papiro_usuario_nome", usuario.nome);
@@ -420,7 +422,9 @@ const templatesFiltrados = templates.filter((template) => {
 
           {loginErro && <p className="login-error">{loginErro}</p>}
 
-          <button>Entrar</button>
+        <button disabled={loginCarregando}>
+  {loginCarregando ? "Entrando..." : "Entrar"}
+</button>
         </form>
 
         <small>
@@ -497,10 +501,23 @@ async function removerProdutoEstoque(id) {
           </div>
         </div>
 
-        <div className="user">
-          <strong>Olá, {nomeUsuario} 🌸</strong>
-          <span>Equipe Papiro</span>
-        </div>
+       <div className="user">
+  <strong>Olá, {nomeUsuario} 🌸</strong>
+  <span>Equipe Papiro</span>
+</div>
+
+<button
+  className="logout-button"
+  onClick={async () => {
+    await supabase.auth.signOut();
+    localStorage.removeItem("papiro_usuario_id");
+    localStorage.removeItem("papiro_usuario_nome");
+    setNomeUsuario("");
+    setLoginSenha("");
+  }}
+>
+  Sair
+</button>
 
         <nav>
           {[
@@ -861,7 +878,6 @@ A Papiro Store é uma papelaria fofa, delicada, organizada, criativa e acolhedor
       </main>
     </div>
   );
-}
 
 function Header({ title, text }) {
   return <section className="hero"><span>Papiro Studio</span><h2>{title}</h2><p>{text}</p></section>;

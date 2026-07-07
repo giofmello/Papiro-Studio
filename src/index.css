@@ -807,4 +807,13 @@ textarea {
   height: 100%;
   object-fit: cover;
   display: block;
+}.logout-button {
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: #f8d8e2;
+  color: var(--tinta);
+  font-weight: 800;
+  cursor: pointer;
 }
