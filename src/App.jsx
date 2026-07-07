@@ -506,21 +506,8 @@ async function removerProdutoEstoque(id) {
   <span>Equipe Papiro</span>
 </div>
 
-<button
-  type="button"
-  className="logout-button"
-  onClick={async () => {
-    await supabase.auth.signOut();
-    localStorage.removeItem("papiro_usuario_id");
-    localStorage.removeItem("papiro_usuario_nome");
-    setNomeUsuario("");
-    setLoginSenha("");
-  }}
->
-  Sair
-</button>
-
 <nav>
+
           {[
             ["inicio", "Início"],
             ["planejamento", "Planejamento"],
@@ -534,6 +521,18 @@ async function removerProdutoEstoque(id) {
               {label}
             </button>
           ))}
+          <button
+  type="button"
+  onClick={async () => {
+    await supabase.auth.signOut();
+    localStorage.removeItem("papiro_usuario_id");
+    localStorage.removeItem("papiro_usuario_nome");
+    setNomeUsuario("");
+    setLoginSenha("");
+  }}
+>
+  Sair
+</button>
         </nav>
       </aside>
 
