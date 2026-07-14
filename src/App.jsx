@@ -267,6 +267,11 @@ export default function App() {
     "fofo, acolhedor e comercial"
   );
   const [iaDetalhes, setIaDetalhes] = useState("");
+  const [primeiroAcesso, setPrimeiroAcesso] = useState(false);
+const [novaSenha, setNovaSenha] = useState("");
+const [confirmarNovaSenha, setConfirmarNovaSenha] = useState("");
+const [senhaErro, setSenhaErro] = useState("");
+const [salvandoSenha, setSalvandoSenha] = useState(false);
 
   useEffect(() => {
     async function carregarClientes() {
@@ -460,57 +465,150 @@ export default function App() {
   );
 
   async function entrar(e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    setLoginErro("");
-    setLoginCarregando(true);
+  setLoginErro("");
+  setLoginCarregando(true);
 
-    const usuario = usuariosSistema.find(
-      (item) => item.id === loginUser
-    );
+  const usuario = usuariosSistema.find(
+    (item) => item.id === loginUser
+  );
 
-    if (!usuario) {
-      setLoginErro("Selecione seu usuário.");
-      setLoginCarregando(false);
-      return;
-    }
-
-    if (!loginSenha.trim()) {
-      setLoginErro("Digite sua senha.");
-      setLoginCarregando(false);
-      return;
-    }
-
-    const { error } =
-      await supabase.auth.signInWithPassword({
-        email: usuario.email,
-        password: loginSenha,
-      });
-
-    if (error) {
-      setLoginErro(
-        "Usuário ou senha incorretos."
-      );
-      setLoginCarregando(false);
-      return;
-    }
-
-    localStorage.setItem(
-      "papiro_usuario_id",
-      usuario.id
-    );
-
-    localStorage.setItem(
-      "papiro_usuario_nome",
-      usuario.nome
-    );
-
-    setNomeUsuario(usuario.nome);
-    setLoginErro("");
+  if (!usuario) {
+    setLoginErro("Selecione seu usuário.");
     setLoginCarregando(false);
+    return;
   }
 
+  if (!loginSenha.trim()) {
+    setLoginErro("Digite sua senha.");
+    setLoginCarregando(false);
+    return;
+  }
+
+  const {
+    data,
+    error,
+  } = await supabase.auth.signInWithPassword({
+    email: usuario.email,
+    password: loginSenha,
+  });
+
+  if (error) {
+    setLoginErro("Usuário ou senha incorretos.");
+    setLoginCarregando(false);
+    return;
+  }
+
+  const senhaJaDefinida =
+    data.user?.user_metadata?.senha_definida === true;
+
+  localStorage.setItem(
+    "papiro_usuario_id",
+    usuario.id
+  );
+
+  localStorage.setItem(
+    "papiro_usuario_nome",
+    usuario.nome
+  );
+
+  setNomeUsuario(usuario.nome);
+  setPrimeiroAcesso(!senhaJaDefinida);
+  setLoginErro("");
+  setLoginCarregando(false);
+}
+if (primeiroAcesso) {
+  return (
+    <main className="welcome">
+      <section className="welcome-card">
+        <div className="papiro-icon">
+          <img src="/favicon.png" alt="Papiro" />
+        </div>
+
+        <h1>Crie sua senha</h1>
+
+        <p>
+          Este é seu primeiro acesso, {nomeUsuario}.
+          Escolha a senha que você usará daqui para frente.
+        </p>
+
+        <form onSubmit={definirNovaSenha}>
+          <input
+            type="password"
+            value={novaSenha}
+            onChange={(e) =>
+              setNovaSenha(e.target.value)
+            }
+            placeholder="Nova senha"
+          />
+
+          <input
+            type="password"
+            value={confirmarNovaSenha}
+            onChange={(e) =>
+              setConfirmarNovaSenha(e.target.value)
+            }
+            placeholder="Confirme a nova senha"
+          />
+
+          {senhaErro && (
+            <p className="login-error">
+              {senhaErro}
+            </p>
+          )}
+
+          <button disabled={salvandoSenha}>
+            {salvandoSenha
+              ? "Salvando..."
+              : "Cadastrar minha senha"}
+          </button>
+        </form>
+      </section>
+    </main>
+  );
+}
  if (!nomeUsuario) {
+  async function definirNovaSenha(e) {
+  e.preventDefault();
+
+  setSenhaErro("");
+
+  if (novaSenha.length < 6) {
+    setSenhaErro(
+      "A senha precisa ter pelo menos 6 caracteres."
+    );
+    return;
+  }
+
+  if (novaSenha !== confirmarNovaSenha) {
+    setSenhaErro("As senhas não são iguais.");
+    return;
+  }
+
+  setSalvandoSenha(true);
+
+  const { error } = await supabase.auth.updateUser({
+    password: novaSenha,
+    data: {
+      senha_definida: true,
+    },
+  });
+
+  if (error) {
+    setSenhaErro(
+      "Não foi possível cadastrar a senha: " +
+        error.message
+    );
+    setSalvandoSenha(false);
+    return;
+  }
+
+  setNovaSenha("");
+  setConfirmarNovaSenha("");
+  setPrimeiroAcesso(false);
+  setSalvandoSenha(false);
+}
   return (
     <main className="welcome">
       <section className="welcome-card">
