@@ -241,150 +241,274 @@ function getStorage(key, fallback) {
 
 export default function App() {
   const [nomeUsuario, setNomeUsuario] = useState(
-  localStorage.getItem("papiro_usuario_nome") || ""
-);
-const [loginUser, setLoginUser] = useState("");
-const [loginSenha, setLoginSenha] = useState("");
-const [loginErro, setLoginErro] = useState("");
-const [loginErro, setLoginErro] = useState("");
-const [loginCarregando, setLoginCarregando] = useState(false);
-const [nome, setNome] = useState("");
-const [nome, setNome] = useState("");
+    localStorage.getItem("papiro_usuario_nome") || ""
+  );
+
+  const [loginUser, setLoginUser] = useState("");
+  const [loginSenha, setLoginSenha] = useState("");
+  const [loginErro, setLoginErro] = useState("");
+  const [loginCarregando, setLoginCarregando] = useState(false);
+
   const [page, setPage] = useState("inicio");
   const [mes, setMes] = useState("Julho");
-  const [clientes, setClientes] = useState(() => getStorage("papiro_clientes", []));
-  const [estoque, setEstoque] = useState(() => getStorage("papiro_estoque", []));
+
+  const [clientes, setClientes] = useState([]);
+  const [estoque, setEstoque] = useState([]);
+
   const [clientForm, setClientForm] = useState(emptyClient);
   const [stockForm, setStockForm] = useState(emptyStock);
-const [buscaTemplate, setBuscaTemplate] = useState("");
-const [categoriaTemplate, setCategoriaTemplate] = useState("Todos");
-const [iaTipo, setIaTipo] = useState("Legenda");
-const [iaTema, setIaTema] = useState("");
-const [iaTom, setIaTom] = useState("fofo, acolhedor e comercial");
-const [iaDetalhes, setIaDetalhes] = useState("");
 
-useEffect(() => {
-  async function carregarClientes() {
+  const [buscaTemplate, setBuscaTemplate] = useState("");
+  const [categoriaTemplate, setCategoriaTemplate] = useState("Todos");
+
+  const [iaTipo, setIaTipo] = useState("Legenda");
+  const [iaTema, setIaTema] = useState("");
+  const [iaTom, setIaTom] = useState(
+    "fofo, acolhedor e comercial"
+  );
+  const [iaDetalhes, setIaDetalhes] = useState("");
+
+  useEffect(() => {
+    async function carregarClientes() {
+      const { data, error } = await supabase
+        .from("clientes")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if (error) {
+        console.log(
+          "Erro ao carregar clientes:",
+          error.message
+        );
+        return;
+      }
+
+      setClientes(data || []);
+    }
+
+    carregarClientes();
+  }, []);
+
+  useEffect(() => {
+    async function carregarEstoque() {
+      const { data, error } = await supabase
+        .from("estoque")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if (error) {
+        console.log(
+          "Erro ao carregar estoque:",
+          error.message
+        );
+        return;
+      }
+
+      setEstoque(data || []);
+    }
+
+    carregarEstoque();
+  }, []);
+
+  async function adicionarCliente(e) {
+    e.preventDefault();
+
+    if (!clientForm.nome.trim()) return;
+
+    const clienteParaSalvar = {
+      ...clientForm,
+      aniversario: clientForm.aniversario || null,
+    };
+
     const { data, error } = await supabase
       .from("clientes")
-      .select("*")
-      .order("id", { ascending: false });
+      .insert([clienteParaSalvar])
+      .select();
 
     if (error) {
-      console.log("Erro ao carregar clientes:", error.message);
+      alert(
+        "Erro ao salvar cliente: " + error.message
+      );
+      console.log("Erro completo:", error);
       return;
     }
 
-    setClientes(data || []);
+    setClientes((clientesAtuais) => [
+      data[0],
+      ...clientesAtuais,
+    ]);
+
+    setClientForm(emptyClient);
   }
 
-  carregarClientes();
-}, []);
-async function adicionarCliente(e) {
-  e.preventDefault();
+  async function removerCliente(id) {
+    const { error } = await supabase
+      .from("clientes")
+      .delete()
+      .eq("id", id);
 
-  if (!clientForm.nome.trim()) return;
+    if (error) {
+      alert(
+        "Erro ao remover cliente: " + error.message
+      );
+      return;
+    }
 
-  const clienteParaSalvar = {
-    ...clientForm,
-    aniversario: clientForm.aniversario || null,
-  };
-
-  const { data, error } = await supabase
-    .from("clientes")
-    .insert([clienteParaSalvar])
-    .select();
-
-  if (error) {
-    alert("Erro ao salvar cliente: " + error.message);
-    console.log("Erro completo:", error);
-    return;
+    setClientes((clientesAtuais) =>
+      clientesAtuais.filter(
+        (cliente) => cliente.id !== id
+      )
+    );
   }
 
-  setClientes([data[0], ...clientes]);
-  setClientForm(emptyClient);
-}
-async function removerCliente(id) {
-  const { error } = await supabase
-    .from("clientes")
-    .delete()
-    .eq("id", id);
+  async function adicionarProduto() {
+    const novoProduto = {
+      codigo: "",
+      produto: "Novo produto",
+      categoria: "",
+      qtd: 0,
+      minimo: 3,
+      custo: 0,
+      venda: 0,
+    };
 
-  if (error) {
-    alert("Erro ao remover cliente.");
-    console.log(error.message);
-    return;
-  }
-
-  setClientes(clientes.filter((cliente) => cliente.id !== id));
-}
-  useEffect(() => {
-  async function carregarEstoque() {
     const { data, error } = await supabase
       .from("estoque")
-      .select("*")
-      .order("id", { ascending: false });
+      .insert([novoProduto])
+      .select();
 
     if (error) {
-      console.log("Erro ao carregar estoque:", error.message);
+      alert(
+        "Erro ao adicionar produto: " +
+          error.message
+      );
       return;
     }
 
-    setEstoque(data || []);
+    setEstoque((estoqueAtual) => [
+      data[0],
+      ...estoqueAtual,
+    ]);
   }
 
-  carregarEstoque();
-}, []);
+  async function atualizarProdutoEstoque(
+    id,
+    campo,
+    valor
+  ) {
+    setEstoque((estoqueAtual) =>
+      estoqueAtual.map((item) =>
+        item.id === id
+          ? { ...item, [campo]: valor }
+          : item
+      )
+    );
 
-  const estoqueBaixo = estoque.filter((i) => Number(i.qtd) <= 3);
+    const { error } = await supabase
+      .from("estoque")
+      .update({ [campo]: valor })
+      .eq("id", id);
+
+    if (error) {
+      alert(
+        "Erro ao atualizar produto: " +
+          error.message
+      );
+    }
+  }
+
+  async function removerProdutoEstoque(id) {
+    const { error } = await supabase
+      .from("estoque")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      alert(
+        "Erro ao remover produto: " +
+          error.message
+      );
+      return;
+    }
+
+    setEstoque((estoqueAtual) =>
+      estoqueAtual.filter(
+        (item) => item.id !== id
+      )
+    );
+  }
+
+  const estoqueBaixo = estoque.filter(
+    (item) =>
+      Number(item.qtd) <= Number(item.minimo ?? 3)
+  );
+
   const diasDoMes = planejamento[mes];
-const templatesFiltrados = templates.filter((template) => {
-  const categoriaOk =
-    categoriaTemplate === "Todos" ||
-    template.categoria === categoriaTemplate;
 
-  const buscaOk = template.nome
-    .toLowerCase()
-    .includes(buscaTemplate.toLowerCase());
+  const templatesFiltrados = templates.filter(
+    (template) => {
+      const categoriaOk =
+        categoriaTemplate === "Todos" ||
+        template.categoria === categoriaTemplate;
 
-  return categoriaOk && buscaOk;
-});
- async function entrar(e) {
-  e.preventDefault();
-  setLoginErro("");
-  setLoginCarregando(true);
+      const buscaOk = template.nome
+        .toLowerCase()
+        .includes(buscaTemplate.toLowerCase());
 
-  const usuario = usuariosSistema.find((u) => u.id === loginUser);
+      return categoriaOk && buscaOk;
+    }
+  );
 
-  if (!usuario) {
-    setLoginErro("Selecione seu usuário.");
+  async function entrar(e) {
+    e.preventDefault();
+
+    setLoginErro("");
+    setLoginCarregando(true);
+
+    const usuario = usuariosSistema.find(
+      (item) => item.id === loginUser
+    );
+
+    if (!usuario) {
+      setLoginErro("Selecione seu usuário.");
+      setLoginCarregando(false);
+      return;
+    }
+
+    if (!loginSenha.trim()) {
+      setLoginErro("Digite sua senha.");
+      setLoginCarregando(false);
+      return;
+    }
+
+    const { error } =
+      await supabase.auth.signInWithPassword({
+        email: usuario.email,
+        password: loginSenha,
+      });
+
+    if (error) {
+      setLoginErro(
+        "Usuário ou senha incorretos."
+      );
+      setLoginCarregando(false);
+      return;
+    }
+
+    localStorage.setItem(
+      "papiro_usuario_id",
+      usuario.id
+    );
+
+    localStorage.setItem(
+      "papiro_usuario_nome",
+      usuario.nome
+    );
+
+    setNomeUsuario(usuario.nome);
+    setLoginErro("");
     setLoginCarregando(false);
-    return;
   }
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email: usuario.email,
-    password: loginSenha,
-  });
-
-  if (error) {
-    setLoginErro("Usuário ou senha incorretos.");
-    setLoginCarregando(false);
-    return;
-  }
-
-  localStorage.setItem("papiro_usuario_id", usuario.id);
-  localStorage.setItem("papiro_usuario_nome", usuario.nome);
-  setNomeUsuario(usuario.nome);
-  setLoginErro("");
-  setLoginCarregando(false);
-}
-
-  localStorage.setItem("papiro_usuario_id", usuario.id);
-  localStorage.setItem("papiro_usuario_nome", usuario.nome);
-  setNomeUsuario(usuario.nome);
-  setLoginErro("");
-}
 
  if (!nomeUsuario) {
   return (
@@ -878,6 +1002,7 @@ A Papiro Store é uma papelaria fofa, delicada, organizada, criativa e acolhedor
       </main>
     </div>
   );
+}
 
 function Header({ title, text }) {
   return <section className="hero"><span>Papiro Studio</span><h2>{title}</h2><p>{text}</p></section>;
