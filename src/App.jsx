@@ -443,28 +443,28 @@ const [salvandoSenha, setSalvandoSenha] = useState(false);
     );
   }
 
-  const estoqueBaixo = estoque.filter(
-    (item) =>
-      Number(item.qtd) <= Number(item.minimo ?? 3)
-  );
+const estoqueBaixo = estoque.filter(
+  (item) =>
+    Number(item.qtd) <= Number(item.minimo ?? 3)
+);
 
-  const diasDoMes = planejamento[mes];
+const diasDoMes = planejamento[mes];
 
-  const templatesFiltrados = templates.filter(
-    (template) => {
-      const categoriaOk =
-        categoriaTemplate === "Todos" ||
-        template.categoria === categoriaTemplate;
+const templatesFiltrados = templates.filter(
+  (template) => {
+    const categoriaOk =
+      categoriaTemplate === "Todos" ||
+      template.categoria === categoriaTemplate;
 
-      const buscaOk = template.nome
-        .toLowerCase()
-        .includes(buscaTemplate.toLowerCase());
+    const buscaOk = template.nome
+      .toLowerCase()
+      .includes(buscaTemplate.toLowerCase());
 
-      return categoriaOk && buscaOk;
-    }
-  );
+    return categoriaOk && buscaOk;
+  }
+);
 
-  async function entrar(e) {
+async function entrar(e) {
   e.preventDefault();
 
   setLoginErro("");
@@ -486,13 +486,11 @@ const [salvandoSenha, setSalvandoSenha] = useState(false);
     return;
   }
 
-  const {
-    data,
-    error,
-  } = await supabase.auth.signInWithPassword({
-    email: usuario.email,
-    password: loginSenha,
-  });
+  const { data, error } =
+    await supabase.auth.signInWithPassword({
+      email: usuario.email,
+      password: loginSenha,
+    });
 
   if (error) {
     setLoginErro("Usuário ou senha incorretos.");
@@ -518,58 +516,8 @@ const [salvandoSenha, setSalvandoSenha] = useState(false);
   setLoginErro("");
   setLoginCarregando(false);
 }
-if (primeiroAcesso) {
-  return (
-    <main className="welcome">
-      <section className="welcome-card">
-        <div className="papiro-icon">
-          <img src="/favicon.png" alt="Papiro" />
-        </div>
 
-        <h1>Crie sua senha</h1>
-
-        <p>
-          Este é seu primeiro acesso, {nomeUsuario}.
-          Escolha a senha que você usará daqui para frente.
-        </p>
-
-        <form onSubmit={definirNovaSenha}>
-          <input
-            type="password"
-            value={novaSenha}
-            onChange={(e) =>
-              setNovaSenha(e.target.value)
-            }
-            placeholder="Nova senha"
-          />
-
-          <input
-            type="password"
-            value={confirmarNovaSenha}
-            onChange={(e) =>
-              setConfirmarNovaSenha(e.target.value)
-            }
-            placeholder="Confirme a nova senha"
-          />
-
-          {senhaErro && (
-            <p className="login-error">
-              {senhaErro}
-            </p>
-          )}
-
-          <button disabled={salvandoSenha}>
-            {salvandoSenha
-              ? "Salvando..."
-              : "Cadastrar minha senha"}
-          </button>
-        </form>
-      </section>
-    </main>
-  );
-}
- if (!nomeUsuario) {
-  async function definirNovaSenha(e) {
+async function definirNovaSenha(e) {
   e.preventDefault();
 
   setSenhaErro("");
@@ -609,6 +557,63 @@ if (primeiroAcesso) {
   setPrimeiroAcesso(false);
   setSalvandoSenha(false);
 }
+
+if (primeiroAcesso) {
+  return (
+    <main className="welcome">
+      <section className="welcome-card">
+        <div className="papiro-icon">
+          <img src="/favicon.png" alt="Papiro" />
+        </div>
+
+        <h1>Crie sua senha</h1>
+
+        <p>
+          Este é seu primeiro acesso, {nomeUsuario}.
+          Escolha a senha que você usará daqui para
+          frente.
+        </p>
+
+        <form onSubmit={definirNovaSenha}>
+          <input
+            type="password"
+            value={novaSenha}
+            onChange={(e) =>
+              setNovaSenha(e.target.value)
+            }
+            placeholder="Nova senha"
+          />
+
+          <input
+            type="password"
+            value={confirmarNovaSenha}
+            onChange={(e) =>
+              setConfirmarNovaSenha(e.target.value)
+            }
+            placeholder="Confirme a nova senha"
+          />
+
+          {senhaErro && (
+            <p className="login-error">
+              {senhaErro}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={salvandoSenha}
+          >
+            {salvandoSenha
+              ? "Salvando..."
+              : "Cadastrar minha senha"}
+          </button>
+        </form>
+      </section>
+    </main>
+  );
+}
+
+if (!nomeUsuario) {
   return (
     <main className="welcome">
       <section className="welcome-card">
@@ -621,36 +626,53 @@ if (primeiroAcesso) {
 
         <form onSubmit={entrar}>
           <select
-  value={loginUser}
-  onChange={(e) => setLoginUser(e.target.value)}
->
-  <option value="" disabled>
-    Selecione seu usuário
-  </option>
+            value={loginUser}
+            onChange={(e) =>
+              setLoginUser(e.target.value)
+            }
+          >
+            <option value="" disabled>
+              Selecione seu usuário
+            </option>
 
-  {usuariosSistema.map((usuario) => (
-    <option key={usuario.id} value={usuario.id}>
-      {usuario.nome}
-    </option>
-  ))}
-</select>
+            {usuariosSistema.map((usuario) => (
+              <option
+                key={usuario.id}
+                value={usuario.id}
+              >
+                {usuario.nome}
+              </option>
+            ))}
+          </select>
 
           <input
             type="password"
             value={loginSenha}
-            onChange={(e) => setLoginSenha(e.target.value)}
-            placeholder="Senha"
+            onChange={(e) =>
+              setLoginSenha(e.target.value)
+            }
+            placeholder="Senha provisória"
           />
 
-          {loginErro && <p className="login-error">{loginErro}</p>}
+          {loginErro && (
+            <p className="login-error">
+              {loginErro}
+            </p>
+          )}
 
-        <button disabled={loginCarregando}>
-  {loginCarregando ? "Entrando..." : "Entrar"}
-</button>
+          <button
+            type="submit"
+            disabled={loginCarregando}
+          >
+            {loginCarregando
+              ? "Entrando..."
+              : "Entrar"}
+          </button>
         </form>
 
         <small>
-          Primeiro acesso: digite uma senha para cadastrar.
+          No primeiro acesso, você poderá criar sua
+          própria senha.
         </small>
       </section>
     </main>
