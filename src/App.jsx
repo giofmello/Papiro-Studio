@@ -260,6 +260,10 @@ export default function App() {
 
   const [buscaTemplate, setBuscaTemplate] = useState("");
   const [categoriaTemplate, setCategoriaTemplate] = useState("Todos");
+  const [buscaEstoque, setBuscaEstoque] = useState("");
+const [categoriaEstoque, setCategoriaEstoque] = useState("Todas");
+const [somenteEstoqueBaixo, setSomenteEstoqueBaixo] =
+  useState(false);
 
   const [iaTipo, setIaTipo] = useState("Legenda");
   const [iaTema, setIaTema] = useState("");
@@ -530,7 +534,48 @@ const [carregandoSessao, setCarregandoSessao] = useState(true);
 const estoqueBaixo = estoque.filter(
   (item) =>
     Number(item.qtd) <= Number(item.minimo ?? 3)
-);const totalProdutosCadastrados = estoque.length;
+);
+const categoriasEstoque = [
+  "Todas",
+  ...Array.from(
+    new Set(
+      estoque
+        .map((item) => item.categoria?.trim())
+        .filter(Boolean)
+    )
+  ).sort((a, b) => a.localeCompare(b, "pt-BR")),
+];
+
+const estoqueFiltrado = estoque.filter((item) => {
+  const termo = buscaEstoque.trim().toLowerCase();
+
+  const correspondeBusca =
+    !termo ||
+    String(item.codigo || "")
+      .toLowerCase()
+      .includes(termo) ||
+    String(item.produto || "")
+      .toLowerCase()
+      .includes(termo);
+
+  const correspondeCategoria =
+    categoriaEstoque === "Todas" ||
+    item.categoria === categoriaEstoque;
+
+  const baixo =
+    Number(item.qtd || 0) <=
+    Number(item.minimo || 0);
+
+  const correspondeEstoqueBaixo =
+    !somenteEstoqueBaixo || baixo;
+
+  return (
+    correspondeBusca &&
+    correspondeCategoria &&
+    correspondeEstoqueBaixo
+  );
+});
+const totalProdutosCadastrados = estoque.length;
 
 const totalUnidadesEstoque = estoque.reduce(
   (total, item) =>
@@ -1089,7 +1134,67 @@ async function removerProdutoEstoque(id) {
 {page === "estoque" && (
   <>
     <Header title="Estoque" text="Gerencie todos os produtos da Papiro." />
+<section className="stock-filters">
+  <div className="stock-search">
+    <label htmlFor="busca-estoque">
+      Buscar produto
+    </label>
 
+    <input
+      id="busca-estoque"
+      type="search"
+      value={buscaEstoque}
+      onChange={(e) =>
+        setBuscaEstoque(e.target.value)
+      }
+      placeholder="Digite o nome ou código"
+    />
+  </div>
+
+  <div className="stock-filter-field">
+    <label htmlFor="categoria-estoque">
+      Categoria
+    </label>
+
+    <select
+      id="categoria-estoque"
+      value={categoriaEstoque}
+      onChange={(e) =>
+        setCategoriaEstoque(e.target.value)
+      }
+    >
+      {categoriasEstoque.map((categoria) => (
+        <option
+          key={categoria}
+          value={categoria}
+        >
+          {categoria}
+        </option>
+      ))}
+    </select>
+  </div>
+
+  <label className="stock-low-filter">
+    <input
+      type="checkbox"
+      checked={somenteEstoqueBaixo}
+      onChange={(e) =>
+        setSomenteEstoqueBaixo(e.target.checked)
+      }
+    />
+
+    <span>Mostrar apenas estoque baixo</span>
+  </label>
+
+  <div className="stock-results-count">
+    <strong>{estoqueFiltrado.length}</strong>
+    <span>
+      {estoqueFiltrado.length === 1
+        ? "produto encontrado"
+        : "produtos encontrados"}
+    </span>
+  </div>
+</section>
     <div className="stock-actions">
       <button onClick={adicionarProduto}>
   + Novo Produto
@@ -1111,7 +1216,7 @@ async function removerProdutoEstoque(id) {
         <span></span>
       </div>
 
-      {estoque.map((item) => {
+{estoqueFiltrado.map((item) => {
         const baixo = Number(item.qtd || 0) <= Number(item.minimo || 0);
 const lucro = Number(item.venda || 0) - Number(item.custo || 0);
 const valorPix = Number(item.venda || 0) * 0.9;
