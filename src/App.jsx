@@ -272,6 +272,7 @@ const [novaSenha, setNovaSenha] = useState("");
 const [confirmarNovaSenha, setConfirmarNovaSenha] = useState("");
 const [senhaErro, setSenhaErro] = useState("");
 const [salvandoSenha, setSalvandoSenha] = useState(false);
+const [carregandoSessao, setCarregandoSessao] = useState(true);
 
   useEffect(() => {
     async function carregarClientes() {
@@ -293,6 +294,89 @@ const [salvandoSenha, setSalvandoSenha] = useState(false);
 
     carregarClientes();
   }, []);
+  useEffect(() => {
+  async function verificarSessao() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (session?.user) {
+      const usuario = usuariosSistema.find(
+        (item) => item.email === session.user.email
+      );
+
+      if (usuario) {
+        setNomeUsuario(usuario.nome);
+
+        localStorage.setItem(
+          "papiro_usuario_id",
+          usuario.id
+        );
+
+        localStorage.setItem(
+          "papiro_usuario_nome",
+          usuario.nome
+        );
+
+        const senhaJaDefinida =
+          session.user.user_metadata?.senha_definida === true;
+
+        setPrimeiroAcesso(!senhaJaDefinida);
+      }
+    } else {
+      setNomeUsuario("");
+      localStorage.removeItem("papiro_usuario_id");
+      localStorage.removeItem("papiro_usuario_nome");
+    }
+
+    setCarregandoSessao(false);
+  }
+
+  verificarSessao();
+
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange(
+    (_event, session) => {
+      if (session?.user) {
+        const usuario = usuariosSistema.find(
+          (item) => item.email === session.user.email
+        );
+
+        if (usuario) {
+          setNomeUsuario(usuario.nome);
+
+          localStorage.setItem(
+            "papiro_usuario_id",
+            usuario.id
+          );
+
+          localStorage.setItem(
+            "papiro_usuario_nome",
+            usuario.nome
+          );
+
+          const senhaJaDefinida =
+            session.user.user_metadata?.senha_definida === true;
+
+          setPrimeiroAcesso(!senhaJaDefinida);
+        }
+      } else {
+        setNomeUsuario("");
+        setPrimeiroAcesso(false);
+
+        localStorage.removeItem("papiro_usuario_id");
+        localStorage.removeItem("papiro_usuario_nome");
+      }
+
+      setCarregandoSessao(false);
+    }
+  );
+
+  return () => {
+    subscription.unsubscribe();
+  };
+}, []);
 
   useEffect(() => {
     async function carregarEstoque() {
@@ -516,7 +600,25 @@ async function entrar(e) {
   setLoginErro("");
   setLoginCarregando(false);
 }
+async function sair() {
+  const { error } = await supabase.auth.signOut({
+    scope: "local",
+  });
 
+  if (error) {
+    console.error("Erro ao sair:", error.message);
+    return;
+  }
+
+  setNomeUsuario("");
+  setPrimeiroAcesso(false);
+  setLoginUser("");
+  setLoginSenha("");
+  setLoginErro("");
+
+  localStorage.removeItem("papiro_usuario_id");
+  localStorage.removeItem("papiro_usuario_nome");
+}
 async function definirNovaSenha(e) {
   e.preventDefault();
 
@@ -557,7 +659,15 @@ async function definirNovaSenha(e) {
   setPrimeiroAcesso(false);
   setSalvandoSenha(false);
 }
-
+if (carregandoSessao) {
+  return (
+    <main className="welcome">
+      <section className="welcome-card">
+        <p>Carregando Papiro Studio...</p>
+      </section>
+    </main>
+  );
+}
 if (primeiroAcesso) {
   return (
     <main className="welcome">
@@ -651,7 +761,7 @@ if (!nomeUsuario) {
             onChange={(e) =>
               setLoginSenha(e.target.value)
             }
-            placeholder="Senha provisória"
+            placeholder="Senha"
           />
 
           {loginErro && (
@@ -669,11 +779,6 @@ if (!nomeUsuario) {
               : "Entrar"}
           </button>
         </form>
-
-        <small>
-          No primeiro acesso, você poderá criar sua
-          própria senha.
-        </small>
       </section>
     </main>
   );
@@ -765,16 +870,7 @@ async function removerProdutoEstoque(id) {
               {label}
             </button>
           ))}
-          <button
-  type="button"
-  onClick={async () => {
-    await supabase.auth.signOut();
-    localStorage.removeItem("papiro_usuario_id");
-    localStorage.removeItem("papiro_usuario_nome");
-    setNomeUsuario("");
-    setLoginSenha("");
-  }}
->
+ <button type="button" onClick={sair}>
   Sair
 </button>
         </nav>
