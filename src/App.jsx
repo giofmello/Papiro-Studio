@@ -839,42 +839,60 @@ async function removerProdutoEstoque(id) {
 }
   return (
     <div className="app">
-      <aside className="sidebar">
-        <div className="brand">
-          <div className="papiro-icon small">
-  <img src="/favicon.png" alt="Papiro" />
-</div>
-          <div>
-            <h1>Papiro Studio</h1>
-            <p>Centro criativo da Papiro</p>
-          </div>
-        </div>
+<aside className="sidebar">
+  <div className="brand">
+    <div className="papiro-icon small">
+      <img src="/favicon.png" alt="Papiro" />
+    </div>
 
-       <div className="user">
-  <strong>Olá, {nomeUsuario} 🌸</strong>
-  <span>Equipe Papiro</span>
-</div>
+    <div className="brand-text">
+      <h1>Papiro Studio</h1>
+      <p>Centro criativo da Papiro</p>
+    </div>
+  </div>
 
-<nav>
+  <div className="user">
+    <div className="user-avatar">
+      {nomeUsuario?.charAt(0).toUpperCase()}
+    </div>
 
-          {[
-            ["inicio", "Início"],
-            ["planejamento", "Planejamento"],
-            ["templates", "Templates"],
-            ["clientes", "Clientes"],
-            ["estoque", "Estoque"],
-            ["atendimento", "Atendimento"],
-            ["ia", "IA Criativa"],
-          ].map(([id, label]) => (
-            <button key={id} onClick={() => setPage(id)} className={page === id ? "active" : ""}>
-              {label}
-            </button>
-          ))}
- <button type="button" onClick={sair}>
-  Sair
-</button>
-        </nav>
-      </aside>
+    <div className="user-info">
+      <strong>{nomeUsuario}</strong>
+      <span>Equipe Papiro</span>
+    </div>
+  </div>
+
+  <nav className="sidebar-nav">
+    {[
+      ["inicio", "🏠", "Início"],
+      ["planejamento", "🗓️", "Planejamento"],
+      ["templates", "✨", "Templates"],
+      ["clientes", "👥", "Clientes"],
+      ["estoque", "📦", "Estoque"],
+      ["atendimento", "💬", "Atendimento"],
+      ["ia", "🤖", "IA Criativa"],
+    ].map(([id, icon, label]) => (
+      <button
+        key={id}
+        type="button"
+        onClick={() => setPage(id)}
+        className={page === id ? "active" : ""}
+      >
+        <span className="nav-icon">{icon}</span>
+        <span>{label}</span>
+      </button>
+    ))}
+  </nav>
+
+  <button
+    type="button"
+    className="logout-button"
+    onClick={sair}
+  >
+    <span className="nav-icon">↪️</span>
+    <span>Sair</span>
+  </button>
+</aside>
 
       <main className="content">
         {page === "inicio" && (
