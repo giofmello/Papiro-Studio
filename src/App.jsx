@@ -895,23 +895,100 @@ async function removerProdutoEstoque(id) {
 </aside>
 
       <main className="content">
-        {page === "inicio" && (
-          <>
-            <Header title={`Olá, ${nomeUsuario} 📜`} text="Hoje é um ótimo dia para criar algo bonito." />
-            <div className="metrics">
-              <Metric label="Clientes" value={clientes.length} />
-              <Metric label="Produtos" value={estoque.length} />
-              <Metric label="Estoque baixo" value={estoqueBaixo.length} />
-              <Metric label="Dias planejados" value={Object.values(planejamento).flat().length} />
-            </div>
-            <div className="grid">
-              <Card title="✨ Ideia do dia" text="Mostre um detalhe bonito da produção ou embalagem." />
-              <Card title="📅 Planejamento" text="Confira os posts do mês e organize a semana." />
-              <Card title="💬 Relacionamento" text="Faça uma enquete ou responda comentários antigos." />
-            </div>
-          </>
-        )}
+{page === "inicio" && (
+  <>
+    <Header
+      title={`Olá, ${nomeUsuario} ✨`}
+      text="Aqui está um resumo da Papiro hoje."
+    />
 
+    <div className="metrics dashboard-metrics">
+      <Metric
+        label="Clientes cadastrados"
+        value={clientes.length}
+        icon="👥"
+      />
+
+      <Metric
+        label="Produtos cadastrados"
+        value={estoque.length}
+        icon="📦"
+      />
+
+      <Metric
+        label="Estoque baixo"
+        value={estoqueBaixo.length}
+        icon="⚠️"
+        destaque={estoqueBaixo.length > 0}
+      />
+
+      <Metric
+        label="Conteúdos planejados"
+        value={Object.values(planejamento).flat().length}
+        icon="🗓️"
+      />
+    </div>
+
+    <section className="dashboard-section">
+      <div className="dashboard-section-title">
+        <div>
+          <span>Atalhos rápidos</span>
+          <h3>O que você quer fazer agora?</h3>
+        </div>
+      </div>
+
+      <div className="grid dashboard-actions">
+        <button
+          type="button"
+          className="dashboard-card"
+          onClick={() => setPage("planejamento")}
+        >
+          <span className="dashboard-card-icon">📅</span>
+          <div>
+            <h3>Planejamento</h3>
+            <p>
+              Confira os conteúdos do mês e organize
+              as próximas publicações.
+            </p>
+          </div>
+          <strong>Ver planejamento →</strong>
+        </button>
+
+        <button
+          type="button"
+          className="dashboard-card"
+          onClick={() => setPage("estoque")}
+        >
+          <span className="dashboard-card-icon">📦</span>
+          <div>
+            <h3>Estoque</h3>
+            <p>
+              Consulte produtos, preços e itens que
+              precisam de reposição.
+            </p>
+          </div>
+          <strong>Ver estoque →</strong>
+        </button>
+
+        <button
+          type="button"
+          className="dashboard-card"
+          onClick={() => setPage("clientes")}
+        >
+          <span className="dashboard-card-icon">💬</span>
+          <div>
+            <h3>Relacionamento</h3>
+            <p>
+              Consulte clientes e mantenha o
+              atendimento da Papiro organizado.
+            </p>
+          </div>
+          <strong>Ver clientes →</strong>
+        </button>
+      </div>
+    </section>
+  </>
+)}
         {page === "planejamento" && (
           <>
             <Header title="Planejamento Editorial" text="Calendário de postagens da Papiro." />
@@ -1242,10 +1319,36 @@ function Header({ title, text }) {
   return <section className="hero"><span>Papiro Studio</span><h2>{title}</h2><p>{text}</p></section>;
 }
 
-function Metric({ label, value }) {
-  return <article className="metric"><span>{label}</span><strong>{value}</strong></article>;
-}
+function Metric({
+  label,
+  value,
+  icon,
+  destaque = false,
+}) {
+  return (
+    <article
+      className={`metric ${
+        destaque ? "metric-alert" : ""
+      }`}
+    >
+      <div className="metric-top">
+        <span>{label}</span>
 
+        {icon && (
+          <span className="metric-icon">
+            {icon}
+          </span>
+        )}
+      </div>
+
+      <strong>{value}</strong>
+
+      {destaque && (
+        <small>Itens que precisam de atenção</small>
+      )}
+    </article>
+  );
+}
 function Card({ title, text, children }) {
   return <article className="card"><h3>{title}</h3><p>{text}</p>{children}</article>;
 }

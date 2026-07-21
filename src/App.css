@@ -182,3 +182,154 @@
     border-right-color: var(--border);
   }
 }
+.dashboard-metrics {
+  margin-top: 8px;
+}
+
+.metric {
+  position: relative;
+  min-height: 145px;
+  padding: 22px;
+  border: 1px solid rgba(90, 70, 90, 0.06);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.metric:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px rgba(90, 70, 90, 0.11);
+}
+
+.metric-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.metric-top > span:first-child {
+  margin-bottom: 0;
+}
+
+.metric-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: #faf3f5;
+  font-size: 19px;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 17px;
+  line-height: 1;
+}
+
+.metric small {
+  display: block;
+  margin-top: 10px;
+  color: #a4586d;
+  font-size: 12px;
+}
+
+.metric-alert {
+  background: linear-gradient(
+    135deg,
+    #fff8ed,
+    #fff
+  );
+  border-color: rgba(222, 166, 80, 0.25);
+}
+
+.metric-alert .metric-icon {
+  background: #fff0ce;
+}
+
+.dashboard-section {
+  margin-top: 34px;
+}
+
+.dashboard-section-title {
+  margin-bottom: 18px;
+}
+
+.dashboard-section-title span {
+  color: var(--rosa);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.dashboard-section-title h3 {
+  margin: 7px 0 0;
+  color: var(--tinta);
+  font-size: 25px;
+}
+
+.dashboard-actions {
+  align-items: stretch;
+}
+
+.dashboard-card {
+  width: 100%;
+  min-height: 245px;
+  padding: 25px;
+  border: 1px solid var(--borda);
+  border-radius: 28px;
+  background: white;
+  box-shadow: var(--sombra);
+  color: var(--tinta);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(224, 143, 168, 0.4);
+  box-shadow: 0 16px 38px rgba(90, 70, 90, 0.12);
+}
+
+.dashboard-card-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 17px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(
+    135deg,
+    #ffe4ef,
+    #f6ecd3
+  );
+  font-size: 23px;
+}
+
+.dashboard-card h3 {
+  margin: 0 0 9px;
+  color: var(--tinta);
+  font-size: 21px;
+}
+
+.dashboard-card p {
+  margin: 0;
+  color: #666;
+  line-height: 1.6;
+}
+
+.dashboard-card > strong {
+  margin-top: auto;
+  color: #c25d7a;
+  font-size: 14px;
+}
