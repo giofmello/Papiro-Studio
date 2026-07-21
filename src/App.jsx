@@ -530,7 +530,47 @@ const [carregandoSessao, setCarregandoSessao] = useState(true);
 const estoqueBaixo = estoque.filter(
   (item) =>
     Number(item.qtd) <= Number(item.minimo ?? 3)
+);const totalProdutosCadastrados = estoque.length;
+
+const totalUnidadesEstoque = estoque.reduce(
+  (total, item) =>
+    total + Number(item.qtd || 0),
+  0
 );
+
+const custoTotalEstoque = estoque.reduce(
+  (total, item) =>
+    total +
+    Number(item.qtd || 0) *
+      Number(item.custo || 0),
+  0
+);
+
+const valorTotalVendaEstoque = estoque.reduce(
+  (total, item) =>
+    total +
+    Number(item.qtd || 0) *
+      Number(item.venda || 0),
+  0
+);
+
+const lucroPotencialEstoque =
+  valorTotalVendaEstoque - custoTotalEstoque;
+
+const margemPotencialEstoque =
+  custoTotalEstoque > 0
+    ? (
+        (lucroPotencialEstoque /
+          custoTotalEstoque) *
+        100
+      )
+    : 0;
+
+const formatarMoeda = (valor) =>
+  Number(valor || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 
 const diasDoMes = planejamento[mes];
 
@@ -1113,6 +1153,59 @@ const valorPix = Number(item.venda || 0) * 0.9;
         );
       })}
     </div>
+
+    <section className="stock-summary">
+      <div className="stock-summary-header">
+        <div>
+          <span>Visão geral</span>
+          <h3>Resumo do estoque</h3>
+        </div>
+
+        <p>
+          Valores calculados com base nas quantidades
+          atualmente cadastradas.
+        </p>
+      </div>
+
+      <div className="stock-summary-grid">
+        <article className="stock-summary-card">
+          <span>Produtos cadastrados</span>
+          <strong>{totalProdutosCadastrados}</strong>
+          <small>Tipos diferentes de produtos</small>
+        </article>
+
+        <article className="stock-summary-card">
+          <span>Unidades em estoque</span>
+          <strong>{totalUnidadesEstoque}</strong>
+          <small>Soma de todas as quantidades</small>
+        </article>
+
+        <article className="stock-summary-card">
+          <span>Custo total do estoque</span>
+          <strong>{formatarMoeda(custoTotalEstoque)}</strong>
+          <small>Valor investido nos produtos</small>
+        </article>
+
+        <article className="stock-summary-card">
+          <span>Valor potencial de venda</span>
+          <strong>{formatarMoeda(valorTotalVendaEstoque)}</strong>
+          <small>Venda de todas as unidades pelo preço normal</small>
+        </article>
+
+        <article className="stock-summary-card highlight">
+          <span>Lucro potencial bruto</span>
+          <strong>{formatarMoeda(lucroPotencialEstoque)}</strong>
+          <small>Antes de taxas, embalagens e outras despesas</small>
+        </article>
+
+        <article className="stock-summary-card">
+          <span>Acréscimo médio sobre o custo</span>
+          <strong>{margemPotencialEstoque.toFixed(1)}%</strong>
+          <small>Comparação entre custo e venda</small>
+        </article>
+      </div>
+    </section>
+
   </>
 )}
 
