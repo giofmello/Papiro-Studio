@@ -876,6 +876,7 @@ async function adicionarProduto() {
     qtd: 0,
     minimo: 3,
     custo: 0,
+    percentual_lucro: 0,
     venda: 0,
   };
 
@@ -889,24 +890,90 @@ async function adicionarProduto() {
     return;
   }
 
-  setEstoque([data[0], ...estoque]);
+  setEstoque((estoqueAtual) => [data[0], ...estoqueAtual]);
 }
 
 async function atualizarProdutoEstoque(id, campo, valor) {
-  setEstoque(
-    estoque.map((item) =>
-      item.id === id ? { ...item, [campo]: valor } : item
+  const camposNumericos = [
+    "qtd",
+    "minimo",
+    "custo",
+    "percentual_lucro",
+    "venda",
+  ];
+
+  const valorTratado = camposNumericos.includes(campo)
+    ? Number(valor || 0)
+    : valor;
+
+  setEstoque((estoqueAtual) =>
+    estoqueAtual.map((item) =>
+      item.id === id
+        ? { ...item, [campo]: valorTratado }
+        : item
     )
   );
 
   const { error } = await supabase
     .from("estoque")
-    .update({ [campo]: valor })
+    .update({ [campo]: valorTratado })
     .eq("id", id);
 
   if (error) {
     alert("Erro ao atualizar produto: " + error.message);
   }
+}
+
+async function atualizarProdutoEstoqueCampos(id, alteracoes) {
+  setEstoque((estoqueAtual) =>
+    estoqueAtual.map((item) =>
+      item.id === id
+        ? { ...item, ...alteracoes }
+        : item
+    )
+  );
+
+  const { error } = await supabase
+    .from("estoque")
+    .update(alteracoes)
+    .eq("id", id);
+
+  if (error) {
+    alert("Erro ao atualizar produto: " + error.message);
+  }
+}
+
+async function atualizarPrecoPorPercentual(
+  id,
+  custo,
+  percentual
+) {
+  const custoNumerico = Number(custo || 0);
+  const percentualNumerico = Number(percentual || 0);
+  const vendaCalculada =
+    custoNumerico * (1 + percentualNumerico / 100);
+
+  await atualizarProdutoEstoqueCampos(id, {
+    percentual_lucro: percentualNumerico,
+    venda: Number(vendaCalculada.toFixed(2)),
+  });
+}
+
+async function atualizarCustoComPercentual(
+  id,
+  custo,
+  percentual
+) {
+  const custoNumerico = Number(custo || 0);
+  const percentualNumerico = Number(percentual || 0);
+  const vendaCalculada =
+    custoNumerico * (1 + percentualNumerico / 100);
+
+  await atualizarProdutoEstoqueCampos(id, {
+    custo: custoNumerico,
+    percentual_lucro: percentualNumerico,
+    venda: Number(vendaCalculada.toFixed(2)),
+  });
 }
 
 async function removerProdutoEstoque(id) {
@@ -1209,51 +1276,149 @@ async function removerProdutoEstoque(id) {
         <span>Qtd</span>
         <span>Mín.</span>
         <span>Custo</span>
+        <span>Lucro %</span>
         <span>Venda</span>
-<span>Pix (-10%)</span>
-<span>Lucro</span>
+        <span>Pix (-10%)</span>
+        <span>Lucro</span>
         <span>Status</span>
         <span></span>
       </div>
 
-{estoqueFiltrado.map((item) => {
-        const baixo = Number(item.qtd || 0) <= Number(item.minimo || 0);
-const lucro = Number(item.venda || 0) - Number(item.custo || 0);
-const valorPix = Number(item.venda || 0) * 0.9;
+      {estoqueFiltrado.map((item) => {
+        const custo = Number(item.custo || 0);
+        const venda = Number(item.venda || 0);
 
-      const editar = (campo, valor) => {
-  atualizarProdutoEstoque(item.id, campo, valor);
-};
+        const percentualCalculado =
+          custo > 0
+            ? ((venda - custo) / custo) * 100
+            : 0;
+
+        const percentualLucro =
+          item.percentual_lucro !== null &&
+          item.percentual_lucro !== undefined
+            ? Number(item.percentual_lucro)
+            : Number(percentualCalculado.toFixed(2));
+
+        const valorPix = venda * 0.9;
+        const lucro = venda - custo;
+
+        const baixo =
+          Number(item.qtd || 0) <=
+          Number(item.minimo || 0);
+
+        const editar = (campo, valor) => {
+          atualizarProdutoEstoque(
+            item.id,
+            campo,
+            valor
+          );
+        };
 
         return (
-          <div className="stock-sheet-row" key={item.id}>
-            <input value={item.codigo || ""} onChange={(e) => editar("codigo", e.target.value)} />
-            <input value={item.produto || ""} onChange={(e) => editar("produto", e.target.value)} />
-            <input value={item.categoria || ""} onChange={(e) => editar("categoria", e.target.value)} />
-            <input type="number" value={item.qtd || ""} onChange={(e) => editar("qtd", e.target.value)} />
-            <input type="number" value={item.minimo || ""} onChange={(e) => editar("minimo", e.target.value)} />
-            <input type="number" value={item.custo || ""} onChange={(e) => editar("custo", e.target.value)} />
+          <div
+            className="stock-sheet-row"
+            key={item.id}
+          >
             <input
-  type="number"
-  value={item.venda || ""}
-  onChange={(e) => editar("venda", e.target.value)}
-/>
+              value={item.codigo || ""}
+              onChange={(e) =>
+                editar("codigo", e.target.value)
+              }
+            />
 
-<strong>
-  R$ {valorPix.toFixed(2)}
-</strong>
+            <input
+              value={item.produto || ""}
+              onChange={(e) =>
+                editar("produto", e.target.value)
+              }
+            />
 
-<strong>
-  R$ {lucro.toFixed(2)}
-</strong>
+            <input
+              value={item.categoria || ""}
+              onChange={(e) =>
+                editar("categoria", e.target.value)
+              }
+            />
 
-            <span className={`stock-status ${baixo ? "danger" : "success"}`}>
+            <input
+              key={`qtd-${item.id}-${item.qtd}`}
+              type="number"
+              min="0"
+              defaultValue={item.qtd ?? 0}
+              onBlur={(e) =>
+                editar("qtd", e.target.value)
+              }
+            />
+
+            <input
+              key={`minimo-${item.id}-${item.minimo}`}
+              type="number"
+              min="0"
+              defaultValue={item.minimo ?? 0}
+              onBlur={(e) =>
+                editar("minimo", e.target.value)
+              }
+            />
+
+            <input
+              key={`custo-${item.id}-${item.custo}`}
+              type="number"
+              min="0"
+              step="0.01"
+              defaultValue={item.custo ?? 0}
+              onBlur={(e) =>
+                atualizarCustoComPercentual(
+                  item.id,
+                  e.target.value,
+                  percentualLucro
+                )
+              }
+            />
+
+            <input
+              key={`percentual-${item.id}-${percentualLucro}`}
+              type="number"
+              min="0"
+              step="0.1"
+              defaultValue={percentualLucro}
+              onBlur={(e) =>
+                atualizarPrecoPorPercentual(
+                  item.id,
+                  item.custo,
+                  e.target.value
+                )
+              }
+              placeholder="%"
+            />
+
+            <strong className="stock-money">
+              R$ {venda.toFixed(2)}
+            </strong>
+
+            <strong className="stock-money">
+              R$ {valorPix.toFixed(2)}
+            </strong>
+
+            <strong className="stock-money">
+              R$ {lucro.toFixed(2)}
+            </strong>
+
+            <span
+              className={`stock-status ${
+                baixo ? "danger" : "success"
+              }`}
+            >
               {baixo ? "🔴 Baixo" : "🟢 OK"}
             </span>
 
-            <button onClick={() => removerProdutoEstoque(item.id)}>
-  🗑️
-</button>
+            <button
+              type="button"
+              onClick={() =>
+                removerProdutoEstoque(item.id)
+              }
+            >
+              🗑️
+            </button>
           </div>
         );
       })}
