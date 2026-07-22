@@ -752,6 +752,43 @@ function formatarAniversario(data) {
   const [ano, mes, dia] = data.split("-");
 
   return `${dia}/${mes}/${ano}`;
+}const dataAtual = new Date();
+const mesAtual = dataAtual.getMonth() + 1;
+
+const nomeMesAtual = dataAtual.toLocaleDateString(
+  "pt-BR",
+  {
+    month: "long",
+  }
+);
+
+const aniversariantesDoMes = clientes
+  .filter((cliente) => {
+    if (!cliente.aniversario) return false;
+
+    const [, mes] =
+      cliente.aniversario.split("-");
+
+    return Number(mes) === mesAtual;
+  })
+  .sort((clienteA, clienteB) => {
+    const diaA = Number(
+      clienteA.aniversario.split("-")[2]
+    );
+
+    const diaB = Number(
+      clienteB.aniversario.split("-")[2]
+    );
+
+    return diaA - diaB;
+  });
+
+function formatarDiaAniversario(data) {
+  if (!data) return "";
+
+  const [, , dia] = data.split("-");
+
+  return dia;
 }
 
 async function entrar(e) {
@@ -1310,7 +1347,67 @@ async function removerProdutoEstoque(id) {
         <strong>{clientesFiltrados.length}</strong>
       </article>
     </section>
+    <article>
+  <span>Aniversariantes do mês</span>
+  <strong>{aniversariantesDoMes.length}</strong>
+</article>
+<section className="client-birthdays">
+  <div className="client-birthdays-header">
+    <div>
+      <span>🎂 Aniversariantes</span>
+      <h3>
+        Aniversários de {nomeMesAtual}
+      </h3>
+    </div>
 
+    <strong>
+      {aniversariantesDoMes.length}
+    </strong>
+  </div>
+
+  {aniversariantesDoMes.length === 0 ? (
+    <div className="client-birthdays-empty">
+      Nenhum cliente faz aniversário neste mês.
+    </div>
+  ) : (
+    <div className="client-birthdays-list">
+      {aniversariantesDoMes.map((cliente) => (
+        <article
+          className="client-birthday-item"
+          key={cliente.id}
+        >
+          <div className="client-birthday-date">
+            <span>Dia</span>
+            <strong>
+              {formatarDiaAniversario(
+                cliente.aniversario
+              )}
+            </strong>
+          </div>
+
+          <div className="client-birthday-info">
+            <strong>{cliente.nome}</strong>
+
+            <span>
+              {cliente.whatsapp ||
+                "WhatsApp não informado"}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            disabled={!cliente.whatsapp}
+            onClick={() =>
+              abrirWhatsApp(cliente.whatsapp)
+            }
+          >
+            WhatsApp
+          </button>
+        </article>
+      ))}
+    </div>
+  )}
+</section>
     <section className="client-search">
       <label htmlFor="busca-cliente">
         Buscar cliente
