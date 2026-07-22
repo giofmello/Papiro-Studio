@@ -1611,3 +1611,76 @@ textarea {
     flex-direction: column;
   }
 }
+.client-form-editing {
+  border-color: rgba(224, 143, 168, 0.5);
+  box-shadow:
+    0 16px 42px rgba(224, 143, 168, 0.14);
+}
+
+.client-edit-alert {
+  padding: 15px 17px;
+  border-radius: 17px;
+  background: #fff0f4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.client-edit-alert div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.client-edit-alert strong {
+  color: var(--tinta);
+}
+
+.client-edit-alert span {
+  color: #777;
+  font-size: 13px;
+}
+
+.client-edit-alert button {
+  flex-shrink: 0;
+  padding: 9px 14px;
+  background: white;
+  color: #b84968;
+  border: 1px solid rgba(184, 73, 104, 0.15);
+}
+
+.client-form-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.client-cancel-button {
+  background: #f3f3f3;
+  color: #666;
+}
+
+.client-edit-button {
+  background: #f3ecff;
+  color: #745b9b;
+}
+
+.client-card-editing {
+  border-color: rgba(224, 143, 168, 0.55);
+  box-shadow:
+    0 15px 36px rgba(224, 143, 168, 0.13);
+}
+
+@media (max-width: 600px) {
+  .client-edit-alert,
+  .client-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .client-edit-alert button,
+  .client-form-actions button {
+    width: 100%;
+  }
+}

@@ -256,7 +256,8 @@ export default function App() {
   const [buscaCliente, setBuscaCliente] = useState("");
   const [estoque, setEstoque] = useState([]);
 
-  const [clientForm, setClientForm] = useState(emptyClient);
+const [clientForm, setClientForm] = useState(emptyClient);
+const [clienteEditando, setClienteEditando] = useState(null);
   const [stockForm, setStockForm] = useState(emptyStock);
 
   const [buscaTemplate, setBuscaTemplate] = useState("");
@@ -435,25 +436,96 @@ const [carregandoSessao, setCarregandoSessao] = useState(true);
     setClientForm(emptyClient);
   }
 
-  async function removerCliente(id) {
-    const { error } = await supabase
-      .from("clientes")
-      .delete()
-      .eq("id", id);
+ async function removerCliente(id) {
+  const confirmar = window.confirm(
+    "Tem certeza que deseja remover este cliente?"
+  );
 
-    if (error) {
-      alert(
-        "Erro ao remover cliente: " + error.message
-      );
-      return;
-    }
+  if (!confirmar) return;
 
-    setClientes((clientesAtuais) =>
-      clientesAtuais.filter(
-        (cliente) => cliente.id !== id
-      )
+  const { error } = await supabase
+    .from("clientes")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert(
+      "Erro ao remover cliente: " + error.message
     );
+    return;
   }
+
+  setClientes((clientesAtuais) =>
+    clientesAtuais.filter(
+      (cliente) => cliente.id !== id
+    )
+  );
+
+  if (clienteEditando === id) {
+    cancelarEdicaoCliente();
+  }
+}
+
+function iniciarEdicaoCliente(cliente) {
+  setClienteEditando(cliente.id);
+
+  setClientForm({
+    nome: cliente.nome || "",
+    whatsapp: cliente.whatsapp || "",
+    instagram: cliente.instagram || "",
+    cidade: cliente.cidade || "",
+    aniversario: cliente.aniversario || "",
+    obs: cliente.obs || "",
+  });
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+}
+
+function cancelarEdicaoCliente() {
+  setClienteEditando(null);
+  setClientForm(emptyClient);
+}
+
+async function salvarEdicaoCliente(e) {
+  e.preventDefault();
+
+  if (!clientForm.nome.trim()) {
+    alert("Informe o nome do cliente.");
+    return;
+  }
+
+  const clienteAtualizado = {
+    ...clientForm,
+    aniversario: clientForm.aniversario || null,
+  };
+
+  const { data, error } = await supabase
+    .from("clientes")
+    .update(clienteAtualizado)
+    .eq("id", clienteEditando)
+    .select();
+
+  if (error) {
+    alert(
+      "Erro ao atualizar cliente: " +
+        error.message
+    );
+    return;
+  }
+
+  setClientes((clientesAtuais) =>
+    clientesAtuais.map((cliente) =>
+      cliente.id === clienteEditando
+        ? data[0]
+        : cliente
+    )
+  );
+
+  cancelarEdicaoCliente();
+}
 
   async function adicionarProduto() {
     const novoProduto = {
@@ -1256,9 +1328,35 @@ async function removerProdutoEstoque(id) {
     </section>
 
     <form
-      className="form client-form"
-      onSubmit={adicionarCliente}
+      className={`form client-form ${
+        clienteEditando
+          ? "client-form-editing"
+          : ""
+      }`}
+      onSubmit={
+        clienteEditando
+          ? salvarEdicaoCliente
+          : adicionarCliente
+      }
     >
+      {clienteEditando && (
+        <div className="client-edit-alert">
+          <div>
+            <strong>Editando cliente</strong>
+            <span>
+              Altere os dados e salve as mudanças.
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={cancelarEdicaoCliente}
+          >
+            Cancelar edição
+          </button>
+        </div>
+      )}
+
       <div className="client-form-grid">
         <label>
           <span>Nome</span>
@@ -1345,9 +1443,23 @@ async function removerProdutoEstoque(id) {
         />
       </label>
 
-      <button type="submit">
-        + Adicionar cliente
-      </button>
+      <div className="client-form-actions">
+        <button type="submit">
+          {clienteEditando
+            ? "Salvar alterações"
+            : "+ Adicionar cliente"}
+        </button>
+
+        {clienteEditando && (
+          <button
+            type="button"
+            className="client-cancel-button"
+            onClick={cancelarEdicaoCliente}
+          >
+            Cancelar
+          </button>
+        )}
+      </div>
     </form>
 
     {clientesFiltrados.length === 0 ? (
@@ -1363,7 +1475,11 @@ async function removerProdutoEstoque(id) {
       <div className="client-grid">
         {clientesFiltrados.map((cliente) => (
           <article
-            className="client-card"
+            className={`client-card ${
+              clienteEditando === cliente.id
+                ? "client-card-editing"
+                : ""
+            }`}
             key={cliente.id}
           >
             <div className="client-card-header">
@@ -1425,7 +1541,17 @@ async function removerProdutoEstoque(id) {
                   abrirWhatsApp(cliente.whatsapp)
                 }
               >
-                Abrir WhatsApp
+                WhatsApp
+              </button>
+
+              <button
+                type="button"
+                className="client-edit-button"
+                onClick={() =>
+                  iniciarEdicaoCliente(cliente)
+                }
+              >
+                Editar
               </button>
 
               <button
