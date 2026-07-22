@@ -253,6 +253,7 @@ export default function App() {
   const [mes, setMes] = useState("Julho");
 
   const [clientes, setClientes] = useState([]);
+  const [buscaCliente, setBuscaCliente] = useState("");
   const [estoque, setEstoque] = useState([]);
 
   const [clientForm, setClientForm] = useState(emptyClient);
@@ -632,6 +633,54 @@ const templatesFiltrados = templates.filter(
     return categoriaOk && buscaOk;
   }
 );
+const clientesFiltrados = clientes.filter((cliente) => {
+  const termo = buscaCliente
+    .trim()
+    .toLowerCase();
+
+  if (!termo) return true;
+
+  return (
+    String(cliente.nome || "")
+      .toLowerCase()
+      .includes(termo) ||
+    String(cliente.whatsapp || "")
+      .toLowerCase()
+      .includes(termo) ||
+    String(cliente.instagram || "")
+      .toLowerCase()
+      .includes(termo) ||
+    String(cliente.cidade || "")
+      .toLowerCase()
+      .includes(termo)
+  );
+});
+
+function abrirWhatsApp(numero) {
+  const numeroLimpo = String(numero || "")
+    .replace(/\D/g, "");
+
+  if (!numeroLimpo) return;
+
+  const numeroCompleto =
+    numeroLimpo.startsWith("55")
+      ? numeroLimpo
+      : `55${numeroLimpo}`;
+
+  window.open(
+    `https://wa.me/${numeroCompleto}`,
+    "_blank",
+    "noopener,noreferrer"
+  );
+}
+
+function formatarAniversario(data) {
+  if (!data) return "Não informado";
+
+  const [ano, mes, dia] = data.split("-");
+
+  return `${dia}/${mes}/${ano}`;
+}
 
 async function entrar(e) {
   e.preventDefault();
@@ -1171,33 +1220,230 @@ async function removerProdutoEstoque(id) {
           </>
         )}
 
-        {page === "clientes" && (
-          <>
-            <Header title="Clientes" text="Cadastre contatos, Instagram e observações." />
-           <form className="form" onSubmit={adicionarCliente}>
-              <input placeholder="Nome" value={clientForm.nome} onChange={(e) => setClientForm({ ...clientForm, nome: e.target.value })} />
-              <input placeholder="WhatsApp" value={clientForm.whatsapp} onChange={(e) => setClientForm({ ...clientForm, whatsapp: e.target.value })} />
-              <input placeholder="Instagram" value={clientForm.instagram} onChange={(e) => setClientForm({ ...clientForm, instagram: e.target.value })} />
-              <input placeholder="Cidade" value={clientForm.cidade} onChange={(e) => setClientForm({ ...clientForm, cidade: e.target.value })} />
-              <input type="date" value={clientForm.aniversario} onChange={(e) => setClientForm({ ...clientForm, aniversario: e.target.value })} />
-              <textarea placeholder="Observações" value={clientForm.obs} onChange={(e) => setClientForm({ ...clientForm, obs: e.target.value })} />
-              <button>Adicionar cliente</button>
-            </form>
-            <div className="grid">
-              {clientes.map((c) => (
-                <Card
-  key={c.id}
-  title={c.nome}
-  text={`WhatsApp: ${c.whatsapp || "—"} | Instagram: ${c.instagram || "—"} | Cidade: ${c.cidade || "—"} | Aniversário: ${c.aniversario || "—"}`}
->
-                  <p>{c.obs}</p>
-                  <button onClick={() => removerCliente(c.id)}>Remover</button>
-                </Card>
-              ))}
-            </div>
-          </>
-        )}
+{page === "clientes" && (
+  <>
+    <Header
+      title="Clientes"
+      text="Cadastre contatos e mantenha o relacionamento da Papiro organizado."
+    />
 
+    <section className="client-summary">
+      <article>
+        <span>Clientes cadastrados</span>
+        <strong>{clientes.length}</strong>
+      </article>
+
+      <article>
+        <span>Resultados encontrados</span>
+        <strong>{clientesFiltrados.length}</strong>
+      </article>
+    </section>
+
+    <section className="client-search">
+      <label htmlFor="busca-cliente">
+        Buscar cliente
+      </label>
+
+      <input
+        id="busca-cliente"
+        type="search"
+        value={buscaCliente}
+        onChange={(e) =>
+          setBuscaCliente(e.target.value)
+        }
+        placeholder="Nome, WhatsApp, Instagram ou cidade"
+      />
+    </section>
+
+    <form
+      className="form client-form"
+      onSubmit={adicionarCliente}
+    >
+      <div className="client-form-grid">
+        <label>
+          <span>Nome</span>
+          <input
+            placeholder="Nome do cliente"
+            value={clientForm.nome}
+            onChange={(e) =>
+              setClientForm({
+                ...clientForm,
+                nome: e.target.value,
+              })
+            }
+          />
+        </label>
+
+        <label>
+          <span>WhatsApp</span>
+          <input
+            placeholder="(12) 99999-9999"
+            value={clientForm.whatsapp}
+            onChange={(e) =>
+              setClientForm({
+                ...clientForm,
+                whatsapp: e.target.value,
+              })
+            }
+          />
+        </label>
+
+        <label>
+          <span>Instagram</span>
+          <input
+            placeholder="@usuario"
+            value={clientForm.instagram}
+            onChange={(e) =>
+              setClientForm({
+                ...clientForm,
+                instagram: e.target.value,
+              })
+            }
+          />
+        </label>
+
+        <label>
+          <span>Cidade</span>
+          <input
+            placeholder="Cidade"
+            value={clientForm.cidade}
+            onChange={(e) =>
+              setClientForm({
+                ...clientForm,
+                cidade: e.target.value,
+              })
+            }
+          />
+        </label>
+
+        <label>
+          <span>Aniversário</span>
+          <input
+            type="date"
+            value={clientForm.aniversario}
+            onChange={(e) =>
+              setClientForm({
+                ...clientForm,
+                aniversario: e.target.value,
+              })
+            }
+          />
+        </label>
+      </div>
+
+      <label className="client-observation">
+        <span>Observações</span>
+        <textarea
+          placeholder="Preferências, pedidos anteriores ou informações importantes"
+          value={clientForm.obs}
+          onChange={(e) =>
+            setClientForm({
+              ...clientForm,
+              obs: e.target.value,
+            })
+          }
+        />
+      </label>
+
+      <button type="submit">
+        + Adicionar cliente
+      </button>
+    </form>
+
+    {clientesFiltrados.length === 0 ? (
+      <section className="client-empty">
+        <span>🔎</span>
+        <h3>Nenhum cliente encontrado</h3>
+        <p>
+          Tente pesquisar usando outro nome,
+          telefone ou cidade.
+        </p>
+      </section>
+    ) : (
+      <div className="client-grid">
+        {clientesFiltrados.map((cliente) => (
+          <article
+            className="client-card"
+            key={cliente.id}
+          >
+            <div className="client-card-header">
+              <div className="client-avatar">
+                {cliente.nome
+                  ?.charAt(0)
+                  .toUpperCase() || "?"}
+              </div>
+
+              <div>
+                <h3>{cliente.nome}</h3>
+                <span>
+                  {cliente.cidade ||
+                    "Cidade não informada"}
+                </span>
+              </div>
+            </div>
+
+            <div className="client-details">
+              <p>
+                <strong>WhatsApp</strong>
+                <span>
+                  {cliente.whatsapp ||
+                    "Não informado"}
+                </span>
+              </p>
+
+              <p>
+                <strong>Instagram</strong>
+                <span>
+                  {cliente.instagram ||
+                    "Não informado"}
+                </span>
+              </p>
+
+              <p>
+                <strong>Aniversário</strong>
+                <span>
+                  {formatarAniversario(
+                    cliente.aniversario
+                  )}
+                </span>
+              </p>
+            </div>
+
+            {cliente.obs && (
+              <div className="client-notes">
+                <strong>Observações</strong>
+                <p>{cliente.obs}</p>
+              </div>
+            )}
+
+            <div className="client-card-actions">
+              <button
+                type="button"
+                className="client-whatsapp-button"
+                disabled={!cliente.whatsapp}
+                onClick={() =>
+                  abrirWhatsApp(cliente.whatsapp)
+                }
+              >
+                Abrir WhatsApp
+              </button>
+
+              <button
+                type="button"
+                className="client-delete-button"
+                onClick={() =>
+                  removerCliente(cliente.id)
+                }
+              >
+                Remover
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
+    )}
+  </>
+)}
 {page === "estoque" && (
   <>
     <Header title="Estoque" text="Gerencie todos os produtos da Papiro." />
