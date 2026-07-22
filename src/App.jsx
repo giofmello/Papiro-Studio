@@ -752,36 +752,69 @@ function formatarAniversario(data) {
   const [ano, mes, dia] = data.split("-");
 
   return `${dia}/${mes}/${ano}`;
-}const dataAtual = new Date();
-const mesAtual = dataAtual.getMonth() + 1;
+}
 
-const nomeMesAtual = dataAtual.toLocaleDateString(
-  "pt-BR",
-  {
-    month: "long",
-  }
-);
+const dataAtual = new Date();
 
-const aniversariantesDoMes = clientes
-  .filter((cliente) => {
-    if (!cliente.aniversario) return false;
-
-    const [, mes] =
+const proximosAniversariantes = clientes
+  .filter((cliente) => cliente.aniversario)
+  .map((cliente) => {
+    const [, mes, dia] =
       cliente.aniversario.split("-");
 
-    return Number(mes) === mesAtual;
+    let proximoAniversario = new Date(
+      dataAtual.getFullYear(),
+      Number(mes) - 1,
+      Number(dia)
+    );
+
+    const hojeSemHorario = new Date(
+      dataAtual.getFullYear(),
+      dataAtual.getMonth(),
+      dataAtual.getDate()
+    );
+
+    if (proximoAniversario < hojeSemHorario) {
+      proximoAniversario = new Date(
+        dataAtual.getFullYear() + 1,
+        Number(mes) - 1,
+        Number(dia)
+      );
+    }
+
+    const diferencaDias = Math.ceil(
+      (proximoAniversario - hojeSemHorario) /
+        (1000 * 60 * 60 * 24)
+    );
+
+    return {
+      ...cliente,
+      proximoAniversario,
+      diferencaDias,
+    };
   })
-  .sort((clienteA, clienteB) => {
-    const diaA = Number(
-      clienteA.aniversario.split("-")[2]
-    );
+  .filter(
+    (cliente) => cliente.diferencaDias <= 60
+  )
+  .sort(
+    (clienteA, clienteB) =>
+      clienteA.diferencaDias -
+      clienteB.diferencaDias
+  );
 
-    const diaB = Number(
-      clienteB.aniversario.split("-")[2]
-    );
-
-    return diaA - diaB;
+function formatarProximoAniversario(data) {
+  return data.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
   });
+}
+
+function textoDiasAniversario(dias) {
+  if (dias === 0) return "Hoje";
+  if (dias === 1) return "Amanhã";
+
+  return `Daqui a ${dias} dias`;
+}
 
 function formatarDiaAniversario(data) {
   if (!data) return "";
@@ -1336,52 +1369,58 @@ async function removerProdutoEstoque(id) {
       text="Cadastre contatos e mantenha o relacionamento da Papiro organizado."
     />
 
-    <section className="client-summary">
-      <article>
-        <span>Clientes cadastrados</span>
-        <strong>{clientes.length}</strong>
-      </article>
+<section className="client-summary">
+  <article>
+    <span>Clientes cadastrados</span>
+    <strong>{clientes.length}</strong>
+  </article>
 
-      <article>
-        <span>Resultados encontrados</span>
-        <strong>{clientesFiltrados.length}</strong>
-      </article>
-    </section>
-    <article>
-  <span>Aniversariantes do mês</span>
-  <strong>{aniversariantesDoMes.length}</strong>
-</article>
+  <article>
+    <span>Resultados encontrados</span>
+    <strong>{clientesFiltrados.length}</strong>
+  </article>
+
+  <article>
+    <span>Próximos aniversários</span>
+    <strong>{proximosAniversariantes.length}</strong>
+  </article>
+</section>
+
 <section className="client-birthdays">
   <div className="client-birthdays-header">
     <div>
       <span>🎂 Aniversariantes</span>
-      <h3>
-        Aniversários de {nomeMesAtual}
-      </h3>
+      <h3>Próximos 60 dias</h3>
     </div>
 
-    <strong>
-      {aniversariantesDoMes.length}
-    </strong>
+    <strong>{proximosAniversariantes.length}</strong>
   </div>
 
-  {aniversariantesDoMes.length === 0 ? (
+  {proximosAniversariantes.length === 0 ? (
     <div className="client-birthdays-empty">
-      Nenhum cliente faz aniversário neste mês.
+      Nenhum aniversário nos próximos 60 dias.
     </div>
   ) : (
     <div className="client-birthdays-list">
-      {aniversariantesDoMes.map((cliente) => (
+      {proximosAniversariantes.map((cliente) => (
         <article
           className="client-birthday-item"
           key={cliente.id}
         >
           <div className="client-birthday-date">
-            <span>Dia</span>
+            <span>
+              {cliente.proximoAniversario
+                .toLocaleDateString("pt-BR", {
+                  month: "short",
+                })
+                .replace(".", "")}
+            </span>
+
             <strong>
-              {formatarDiaAniversario(
-                cliente.aniversario
-              )}
+              {cliente.proximoAniversario
+                .getDate()
+                .toString()
+                .padStart(2, "0")}
             </strong>
           </div>
 
@@ -1389,8 +1428,13 @@ async function removerProdutoEstoque(id) {
             <strong>{cliente.nome}</strong>
 
             <span>
-              {cliente.whatsapp ||
-                "WhatsApp não informado"}
+              {formatarProximoAniversario(
+                cliente.proximoAniversario
+              )}
+              {" • "}
+              {textoDiasAniversario(
+                cliente.diferencaDias
+              )}
             </span>
           </div>
 
@@ -1408,7 +1452,8 @@ async function removerProdutoEstoque(id) {
     </div>
   )}
 </section>
-    <section className="client-search">
+
+<section className="client-search">
       <label htmlFor="busca-cliente">
         Buscar cliente
       </label>

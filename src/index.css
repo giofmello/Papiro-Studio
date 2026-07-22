@@ -1826,4 +1826,8 @@ textarea {
     grid-column: 1 / -1;
     width: 100%;
   }
+}.client-summary article {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
