@@ -3,6 +3,15 @@ import "./index.css";
 import { supabase } from "./supabase";
 const emptyClient = { nome: "", whatsapp: "", instagram: "", cidade: "", aniversario: "", obs: "" };
 const emptyStock = { produto: "", categoria: "", qtd: "", custo: "", venda: "" };
+const emptyProfile = {
+  nome: "",
+  funcao: "",
+  whatsapp: "",
+  aniversario: "",
+  bio: "",
+  responsabilidades: "",
+};
+
 
 const planejamento = {
   Julho: [
@@ -279,6 +288,12 @@ const [confirmarNovaSenha, setConfirmarNovaSenha] = useState("");
 const [senhaErro, setSenhaErro] = useState("");
 const [salvandoSenha, setSalvandoSenha] = useState(false);
 const [carregandoSessao, setCarregandoSessao] = useState(true);
+const [usuarioAuthId, setUsuarioAuthId] = useState("");
+const [emailUsuario, setEmailUsuario] = useState("");
+const [perfil, setPerfil] = useState(emptyProfile);
+const [perfilCarregando, setPerfilCarregando] = useState(false);
+const [perfilSalvando, setPerfilSalvando] = useState(false);
+const [perfilMensagem, setPerfilMensagem] = useState("");
 
   useEffect(() => {
     async function carregarClientes() {
@@ -307,6 +322,9 @@ const [carregandoSessao, setCarregandoSessao] = useState(true);
     } = await supabase.auth.getSession();
 
     if (session?.user) {
+      setUsuarioAuthId(session.user.id);
+      setEmailUsuario(session.user.email || "");
+
       const usuario = usuariosSistema.find(
         (item) => item.email === session.user.email
       );
@@ -331,6 +349,9 @@ const [carregandoSessao, setCarregandoSessao] = useState(true);
       }
     } else {
       setNomeUsuario("");
+      setUsuarioAuthId("");
+      setEmailUsuario("");
+      setPerfil(emptyProfile);
       localStorage.removeItem("papiro_usuario_id");
       localStorage.removeItem("papiro_usuario_nome");
     }
@@ -345,6 +366,9 @@ const [carregandoSessao, setCarregandoSessao] = useState(true);
   } = supabase.auth.onAuthStateChange(
     (_event, session) => {
       if (session?.user) {
+        setUsuarioAuthId(session.user.id);
+        setEmailUsuario(session.user.email || "");
+
         const usuario = usuariosSistema.find(
           (item) => item.email === session.user.email
         );
@@ -370,6 +394,9 @@ const [carregandoSessao, setCarregandoSessao] = useState(true);
       } else {
         setNomeUsuario("");
         setPrimeiroAcesso(false);
+        setUsuarioAuthId("");
+        setEmailUsuario("");
+        setPerfil(emptyProfile);
 
         localStorage.removeItem("papiro_usuario_id");
         localStorage.removeItem("papiro_usuario_nome");
@@ -383,6 +410,54 @@ const [carregandoSessao, setCarregandoSessao] = useState(true);
     subscription.unsubscribe();
   };
 }, []);
+
+  useEffect(() => {
+    if (!usuarioAuthId) {
+      setPerfil(emptyProfile);
+      return;
+    }
+
+    async function carregarPerfil() {
+      setPerfilCarregando(true);
+      setPerfilMensagem("");
+
+      const { data, error } = await supabase
+        .from("perfis")
+        .select("*")
+        .eq("user_id", usuarioAuthId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Erro ao carregar perfil:", error.message);
+        setPerfilMensagem(
+          "Não foi possível carregar seu perfil."
+        );
+        setPerfilCarregando(false);
+        return;
+      }
+
+      const usuarioSistema = usuariosSistema.find(
+        (usuario) => usuario.email === emailUsuario
+      );
+
+      setPerfil({
+        nome:
+          data?.nome ||
+          usuarioSistema?.nome ||
+          nomeUsuario ||
+          "",
+        funcao: data?.funcao || "",
+        whatsapp: data?.whatsapp || "",
+        aniversario: data?.aniversario || "",
+        bio: data?.bio || "",
+        responsabilidades: data?.responsabilidades || "",
+      });
+
+      setPerfilCarregando(false);
+    }
+
+    carregarPerfil();
+  }, [usuarioAuthId, emailUsuario, nomeUsuario]);
 
   useEffect(() => {
     async function carregarEstoque() {
@@ -824,6 +899,160 @@ function formatarDiaAniversario(data) {
   return dia;
 }
 
+
+const horaAtual = dataAtual.getHours();
+
+const saudacao =
+  horaAtual < 12
+    ? "Bom dia"
+    : horaAtual < 18
+      ? "Boa tarde"
+      : "Boa noite";
+
+const dataCompleta = dataAtual.toLocaleDateString("pt-BR", {
+  weekday: "long",
+  day: "2-digit",
+  month: "long",
+  year: "numeric",
+});
+
+const dataCompletaFormatada =
+  dataCompleta.charAt(0).toUpperCase() +
+  dataCompleta.slice(1);
+
+const nomesMesesPlanejamento = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
+
+const mesAtualPlanejamento =
+  nomesMesesPlanejamento[dataAtual.getMonth()];
+
+const dataHojePlanejamento = `${String(
+  dataAtual.getDate()
+).padStart(2, "0")}/${String(
+  dataAtual.getMonth() + 1
+).padStart(2, "0")}`;
+
+const planejamentoDeHoje =
+  (planejamento[mesAtualPlanejamento] || []).find(
+    ([data]) => data === dataHojePlanejamento
+  );
+
+const temaDeHoje = planejamentoDeHoje?.[2] || "";
+const conteudosDeHoje = planejamentoDeHoje?.[3] || [];
+
+const aniversariantesHoje =
+  proximosAniversariantes.filter(
+    (cliente) => cliente.diferencaDias === 0
+  );
+
+const aniversariantesAmanha =
+  proximosAniversariantes.filter(
+    (cliente) => cliente.diferencaDias === 1
+  );
+
+const totalAvisosDoDia =
+  (estoqueBaixo.length > 0 ? 1 : 0) +
+  (conteudosDeHoje.length > 0 ? 1 : 0) +
+  (aniversariantesHoje.length > 0 ? 1 : 0) +
+  (aniversariantesAmanha.length > 0 ? 1 : 0);
+
+function abrirEstoqueBaixo() {
+  setSomenteEstoqueBaixo(true);
+  setPage("estoque");
+}
+
+function abrirPlanejamentoDeHoje() {
+  if (planejamento[mesAtualPlanejamento]) {
+    setMes(mesAtualPlanejamento);
+  }
+
+  setPage("planejamento");
+}
+
+
+
+function atualizarCampoPerfil(campo, valor) {
+  setPerfil((perfilAtual) => ({
+    ...perfilAtual,
+    [campo]: valor,
+  }));
+
+  setPerfilMensagem("");
+}
+
+async function salvarPerfil(e) {
+  e.preventDefault();
+
+  if (!usuarioAuthId) return;
+
+  if (!perfil.nome.trim()) {
+    setPerfilMensagem("Informe seu nome.");
+    return;
+  }
+
+  setPerfilSalvando(true);
+  setPerfilMensagem("");
+
+  const perfilParaSalvar = {
+    user_id: usuarioAuthId,
+    nome: perfil.nome.trim(),
+    funcao: perfil.funcao.trim(),
+    whatsapp: perfil.whatsapp.trim(),
+    aniversario: perfil.aniversario || null,
+    bio: perfil.bio.trim(),
+    responsabilidades: perfil.responsabilidades.trim(),
+    atualizado_em: new Date().toISOString(),
+  };
+
+  const { data, error } = await supabase
+    .from("perfis")
+    .upsert(perfilParaSalvar, {
+      onConflict: "user_id",
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Erro ao salvar perfil:", error.message);
+    setPerfilMensagem(
+      "Não foi possível salvar. Confira se a tabela perfis foi criada no Supabase."
+    );
+    setPerfilSalvando(false);
+    return;
+  }
+
+  setPerfil({
+    nome: data.nome || "",
+    funcao: data.funcao || "",
+    whatsapp: data.whatsapp || "",
+    aniversario: data.aniversario || "",
+    bio: data.bio || "",
+    responsabilidades: data.responsabilidades || "",
+  });
+
+  setNomeUsuario(data.nome || nomeUsuario);
+  localStorage.setItem(
+    "papiro_usuario_nome",
+    data.nome || nomeUsuario
+  );
+
+  setPerfilMensagem("Perfil salvo com sucesso! ✨");
+  setPerfilSalvando(false);
+}
+
+
 async function entrar(e) {
   e.preventDefault();
 
@@ -888,6 +1117,9 @@ async function sair() {
 
   setNomeUsuario("");
   setPrimeiroAcesso(false);
+  setUsuarioAuthId("");
+  setEmailUsuario("");
+  setPerfil(emptyProfile);
   setLoginUser("");
   setLoginSenha("");
   setLoginErro("");
@@ -1194,16 +1426,26 @@ async function removerProdutoEstoque(id) {
     </div>
   </div>
 
-  <div className="user">
+  <button
+    type="button"
+    className={`user user-profile-button ${
+      page === "perfil" ? "active" : ""
+    }`}
+    onClick={() => setPage("perfil")}
+  >
     <div className="user-avatar">
-      {nomeUsuario?.charAt(0).toUpperCase()}
+      {(perfil.nome || nomeUsuario)
+        ?.charAt(0)
+        .toUpperCase()}
     </div>
 
     <div className="user-info">
-      <strong>{nomeUsuario}</strong>
-      <span>Equipe Papiro</span>
+      <strong>{perfil.nome || nomeUsuario}</strong>
+      <span>{perfil.funcao || "Meu perfil"}</span>
     </div>
-  </div>
+
+    <span className="user-profile-arrow">›</span>
+  </button>
 
   <nav className="sidebar-nav">
     {[
@@ -1214,6 +1456,7 @@ async function removerProdutoEstoque(id) {
       ["estoque", "📦", "Estoque"],
       ["atendimento", "💬", "Atendimento"],
       ["ia", "🤖", "IA Criativa"],
+      ["perfil", "👤", "Meu Perfil"],
     ].map(([id, icon, label]) => (
       <button
         key={id}
@@ -1240,22 +1483,39 @@ async function removerProdutoEstoque(id) {
       <main className="content">
 {page === "inicio" && (
   <>
-    <Header
-      title={`Olá, ${nomeUsuario} ✨`}
-      text="Aqui está um resumo da Papiro hoje."
-    />
+    <section className="dashboard-welcome">
+      <div>
+        <span>Papiro Studio</span>
+        <h2>
+          {saudacao}, {nomeUsuario} ✨
+        </h2>
+        <p>{dataCompletaFormatada}</p>
+      </div>
+
+      <div className="dashboard-welcome-badge">
+        <span>Avisos de hoje</span>
+        <strong>{totalAvisosDoDia}</strong>
+      </div>
+    </section>
 
     <div className="metrics dashboard-metrics">
       <Metric
         label="Clientes cadastrados"
         value={clientes.length}
         icon="👥"
+        onClick={() => setPage("clientes")}
+        hint="Abrir clientes"
       />
 
       <Metric
         label="Produtos cadastrados"
         value={estoque.length}
         icon="📦"
+        onClick={() => {
+          setSomenteEstoqueBaixo(false);
+          setPage("estoque");
+        }}
+        hint="Abrir estoque"
       />
 
       <Metric
@@ -1263,14 +1523,168 @@ async function removerProdutoEstoque(id) {
         value={estoqueBaixo.length}
         icon="⚠️"
         destaque={estoqueBaixo.length > 0}
+        onClick={abrirEstoqueBaixo}
+        hint="Ver itens com estoque baixo"
       />
 
       <Metric
-        label="Conteúdos planejados"
-        value={Object.values(planejamento).flat().length}
+        label="Conteúdos de hoje"
+        value={conteudosDeHoje.length}
         icon="🗓️"
+        onClick={abrirPlanejamentoDeHoje}
+        hint="Abrir planejamento de hoje"
+      />
+
+      <Metric
+        label="Próximos aniversários"
+        value={proximosAniversariantes.length}
+        icon="🎂"
+        onClick={() => setPage("clientes")}
+        hint="Abrir aniversários"
       />
     </div>
+
+    <section className="dashboard-section dashboard-notices">
+      <div className="dashboard-section-title">
+        <div>
+          <span>Avisos do dia</span>
+          <h3>O que precisa da sua atenção hoje?</h3>
+        </div>
+      </div>
+
+      {totalAvisosDoDia === 0 ? (
+        <div className="dashboard-notice-empty">
+          <span>✨</span>
+          <div>
+            <strong>Tudo tranquilo por aqui!</strong>
+            <p>
+              Não há aniversários, conteúdos ou alertas
+              de estoque para hoje.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="dashboard-notice-list">
+          {conteudosDeHoje.length > 0 && (
+            <button
+              type="button"
+              className="dashboard-notice"
+              onClick={abrirPlanejamentoDeHoje}
+            >
+              <span className="dashboard-notice-icon">
+                📅
+              </span>
+
+              <div>
+                <strong>
+                  {conteudosDeHoje.length}{" "}
+                  {conteudosDeHoje.length === 1
+                    ? "conteúdo planejado"
+                    : "conteúdos planejados"}{" "}
+                  para hoje
+                </strong>
+
+                <p>
+                  {temaDeHoje || "Confira o planejamento do dia."}
+                </p>
+              </div>
+
+              <span className="dashboard-notice-arrow">
+                →
+              </span>
+            </button>
+          )}
+
+          {estoqueBaixo.length > 0 && (
+            <button
+              type="button"
+              className="dashboard-notice warning"
+              onClick={abrirEstoqueBaixo}
+            >
+              <span className="dashboard-notice-icon">
+                ⚠️
+              </span>
+
+              <div>
+                <strong>
+                  {estoqueBaixo.length}{" "}
+                  {estoqueBaixo.length === 1
+                    ? "produto precisa"
+                    : "produtos precisam"}{" "}
+                  de reposição
+                </strong>
+
+                <p>
+                  Abra o estoque para conferir os itens.
+                </p>
+              </div>
+
+              <span className="dashboard-notice-arrow">
+                →
+              </span>
+            </button>
+          )}
+
+          {aniversariantesHoje.length > 0 && (
+            <button
+              type="button"
+              className="dashboard-notice birthday"
+              onClick={() => setPage("clientes")}
+            >
+              <span className="dashboard-notice-icon">
+                🎂
+              </span>
+
+              <div>
+                <strong>
+                  Aniversário hoje:{" "}
+                  {aniversariantesHoje
+                    .map((cliente) => cliente.nome)
+                    .join(", ")}
+                </strong>
+
+                <p>
+                  Abra Clientes para enviar uma mensagem.
+                </p>
+              </div>
+
+              <span className="dashboard-notice-arrow">
+                →
+              </span>
+            </button>
+          )}
+
+          {aniversariantesAmanha.length > 0 && (
+            <button
+              type="button"
+              className="dashboard-notice birthday"
+              onClick={() => setPage("clientes")}
+            >
+              <span className="dashboard-notice-icon">
+                🎈
+              </span>
+
+              <div>
+                <strong>
+                  Aniversário amanhã:{" "}
+                  {aniversariantesAmanha
+                    .map((cliente) => cliente.nome)
+                    .join(", ")}
+                </strong>
+
+                <p>
+                  Deixe a mensagem preparada com antecedência.
+                </p>
+              </div>
+
+              <span className="dashboard-notice-arrow">
+                →
+              </span>
+            </button>
+          )}
+        </div>
+      )}
+    </section>
 
     <section className="dashboard-section">
       <div className="dashboard-section-title">
@@ -1284,9 +1698,10 @@ async function removerProdutoEstoque(id) {
         <button
           type="button"
           className="dashboard-card"
-          onClick={() => setPage("planejamento")}
+          onClick={abrirPlanejamentoDeHoje}
         >
           <span className="dashboard-card-icon">📅</span>
+
           <div>
             <h3>Planejamento</h3>
             <p>
@@ -1294,15 +1709,20 @@ async function removerProdutoEstoque(id) {
               as próximas publicações.
             </p>
           </div>
+
           <strong>Ver planejamento →</strong>
         </button>
 
         <button
           type="button"
           className="dashboard-card"
-          onClick={() => setPage("estoque")}
+          onClick={() => {
+            setSomenteEstoqueBaixo(false);
+            setPage("estoque");
+          }}
         >
           <span className="dashboard-card-icon">📦</span>
+
           <div>
             <h3>Estoque</h3>
             <p>
@@ -1310,6 +1730,7 @@ async function removerProdutoEstoque(id) {
               precisam de reposição.
             </p>
           </div>
+
           <strong>Ver estoque →</strong>
         </button>
 
@@ -1319,6 +1740,7 @@ async function removerProdutoEstoque(id) {
           onClick={() => setPage("clientes")}
         >
           <span className="dashboard-card-icon">💬</span>
+
           <div>
             <h3>Relacionamento</h3>
             <p>
@@ -1326,6 +1748,7 @@ async function removerProdutoEstoque(id) {
               atendimento da Papiro organizado.
             </p>
           </div>
+
           <strong>Ver clientes →</strong>
         </button>
       </div>
@@ -2000,89 +2423,215 @@ async function removerProdutoEstoque(id) {
       text="Biblioteca oficial de templates da Papiro."
     />
 
-    <div className="template-toolbar">
-      <input
-        type="text"
-        placeholder="🔍 Procurar template..."
-        value={buscaTemplate}
-        onChange={(e) => setBuscaTemplate(e.target.value)}
-      />
+    <section className="templates-panel">
+      <div className="templates-toolbar">
+        <label className="template-search">
+          <span>🔍</span>
 
-      <select
-        value={categoriaTemplate}
-        onChange={(e) => setCategoriaTemplate(e.target.value)}
-      >
-        <option>Todos</option>
-        <option>Feed</option>
-        <option>Stories</option>
-      </select>
-    </div>
+          <input
+            type="text"
+            placeholder="Procurar por nome..."
+            value={buscaTemplate}
+            onChange={(e) =>
+              setBuscaTemplate(e.target.value)
+            }
+          />
 
-    <div className="metrics">
-      <Metric
-        label="Feed"
-        value={templates.filter((t) => t.categoria === "Feed").length}
-      />
+          {buscaTemplate && (
+            <button
+              type="button"
+              aria-label="Limpar busca"
+              onClick={() => setBuscaTemplate("")}
+            >
+              ×
+            </button>
+          )}
+        </label>
 
-      <Metric
-        label="Stories"
-        value={templates.filter((t) => t.categoria === "Stories").length}
-      />
-
-      <Metric
-        label="Total"
-        value={templates.length}
-      />
-
-      <Metric
-        label="Com link"
-        value={templates.filter((t) => t.canva).length}
-      />
-    </div>
-
-    <div className="grid">
-      {templatesFiltrados.map((template) => (
-        <article
-          className="template"
-          key={template.categoria + template.nome}
+        <div
+          className="template-filter-tabs"
+          aria-label="Filtrar templates por categoria"
         >
-         <div className="template-preview">
-  {template.preview ? (
-    <img
-      src={template.preview}
-      alt={`Prévia de ${template.nome}`}
-    />
-  ) : (
-    <span>{template.categoria}</span>
-  )}
-</div>
+          {["Todos", "Feed", "Stories"].map(
+            (categoria) => (
+              <button
+                type="button"
+                key={categoria}
+                className={
+                  categoriaTemplate === categoria
+                    ? "active"
+                    : ""
+                }
+                onClick={() =>
+                  setCategoriaTemplate(categoria)
+                }
+              >
+                {categoria}
+              </button>
+            )
+          )}
+        </div>
+      </div>
 
-          <span className="template-tag">
-            {template.categoria}
-          </span>
-
-          <h3>{template.nome}</h3>
-
-          <p>
-            {template.canva
-              ? "Modelo do Canva cadastrado."
-              : "Link do Canva ainda não cadastrado."}
-          </p>
-
-          <button
-            onClick={() => {
-              if (template.canva) {
-                window.open(template.canva, "_blank");
-              } else {
-                alert("Link do Canva ainda não cadastrado.");
-              }
-            }}
-          >
-            🎨 Abrir Canva
-          </button>
+      <div className="template-overview">
+        <article>
+          <span>✨</span>
+          <div>
+            <small>Total da biblioteca</small>
+            <strong>{templates.length}</strong>
+          </div>
         </article>
-      ))}
+
+        <article>
+          <span>🖼️</span>
+          <div>
+            <small>Feed</small>
+            <strong>
+              {
+                templates.filter(
+                  (template) =>
+                    template.categoria === "Feed"
+                ).length
+              }
+            </strong>
+          </div>
+        </article>
+
+        <article>
+          <span>📱</span>
+          <div>
+            <small>Stories</small>
+            <strong>
+              {
+                templates.filter(
+                  (template) =>
+                    template.categoria === "Stories"
+                ).length
+              }
+            </strong>
+          </div>
+        </article>
+
+        <article>
+          <span>🎨</span>
+          <div>
+            <small>Resultados</small>
+            <strong>{templatesFiltrados.length}</strong>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <div className="templates-results-header">
+      <div>
+        <span>Biblioteca</span>
+        <h3>
+          {categoriaTemplate === "Todos"
+            ? "Todos os templates"
+            : `Templates de ${categoriaTemplate}`}
+        </h3>
+      </div>
+
+      <p>
+        {templatesFiltrados.length}{" "}
+        {templatesFiltrados.length === 1
+          ? "modelo encontrado"
+          : "modelos encontrados"}
+      </p>
     </div>
+
+    {templatesFiltrados.length === 0 ? (
+      <div className="templates-empty">
+        <span>🔎</span>
+        <h3>Nenhum template encontrado</h3>
+        <p>
+          Tente outro nome ou escolha uma categoria
+          diferente.
+        </p>
+
+        <button
+          type="button"
+          onClick={() => {
+            setBuscaTemplate("");
+            setCategoriaTemplate("Todos");
+          }}
+        >
+          Limpar filtros
+        </button>
+      </div>
+    ) : (
+      <div className="templates-grid">
+        {templatesFiltrados.map((template) => (
+          <article
+            className="template-card"
+            key={template.categoria + template.nome}
+          >
+            <div className="template-card-preview">
+              {template.preview ? (
+                <img
+                  src={template.preview}
+                  alt={`Prévia de ${template.nome}`}
+                  loading="lazy"
+                  onError={(evento) => {
+                    const preview =
+                      evento.currentTarget.parentElement;
+
+                    if (preview) {
+                      preview.classList.add(
+                        "preview-error"
+                      );
+                    }
+
+                    evento.currentTarget.remove();
+                  }}
+                />
+              ) : (
+                <div className="template-preview-fallback">
+                  <span>
+                    {template.categoria === "Feed"
+                      ? "🖼️"
+                      : "📱"}
+                  </span>
+                  <small>Prévia indisponível</small>
+                </div>
+              )}
+
+              <span className="template-card-badge">
+                {template.categoria}
+              </span>
+            </div>
+
+            <div className="template-card-content">
+              <h3>{template.nome}</h3>
+
+              <p>
+                Modelo oficial da Papiro pronto para
+                personalizar no Canva.
+              </p>
+
+              <button
+                type="button"
+                disabled={!template.canva}
+                onClick={() => {
+                  if (template.canva) {
+                    window.open(
+                      template.canva,
+                      "_blank",
+                      "noopener,noreferrer"
+                    );
+                  }
+                }}
+              >
+                <span>🎨</span>
+                {template.canva
+                  ? "Abrir no Canva"
+                  : "Link indisponível"}
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
+    )}
   </>
 )}
 {page === "atendimento" && (
@@ -2111,6 +2660,215 @@ async function removerProdutoEstoque(id) {
         </article>
       ))}
     </div>
+  </>
+)}
+
+  {page === "perfil" && (
+  <>
+    <Header
+      title="Meu Perfil"
+      text="Mantenha seus dados e suas responsabilidades na Papiro atualizados."
+    />
+
+    {perfilCarregando ? (
+      <section className="profile-loading">
+        <span>✨</span>
+        <p>Carregando seu perfil...</p>
+      </section>
+    ) : (
+      <div className="profile-layout">
+        <aside className="profile-summary-card">
+          <div className="profile-avatar-large">
+            {(perfil.nome || nomeUsuario)
+              ?.charAt(0)
+              .toUpperCase()}
+          </div>
+
+          <span className="profile-tag">
+            Equipe Papiro
+          </span>
+
+          <h3>{perfil.nome || nomeUsuario}</h3>
+
+          <p className="profile-role">
+            {perfil.funcao ||
+              "Complete sua função na Papiro"}
+          </p>
+
+          <div className="profile-contact-list">
+            <div>
+              <span>✉️</span>
+              <div>
+                <small>E-mail de acesso</small>
+                <strong>{emailUsuario}</strong>
+              </div>
+            </div>
+
+            <div>
+              <span>📱</span>
+              <div>
+                <small>WhatsApp</small>
+                <strong>
+                  {perfil.whatsapp || "Não informado"}
+                </strong>
+              </div>
+            </div>
+
+            <div>
+              <span>🎂</span>
+              <div>
+                <small>Aniversário</small>
+                <strong>
+                  {perfil.aniversario
+                    ? formatarAniversario(
+                        perfil.aniversario
+                      )
+                    : "Não informado"}
+                </strong>
+              </div>
+            </div>
+          </div>
+
+          <div className="profile-security-note">
+            <span>🔒</span>
+            <p>
+              Apenas você pode visualizar e editar
+              este perfil.
+            </p>
+          </div>
+        </aside>
+
+        <form
+          className="profile-form-card"
+          onSubmit={salvarPerfil}
+        >
+          <div className="profile-form-header">
+            <div>
+              <span>Dados pessoais</span>
+              <h3>Edite suas informações</h3>
+            </div>
+
+            <span className="profile-owner-badge">
+              Perfil próprio
+            </span>
+          </div>
+
+          <div className="profile-form-grid">
+            <label>
+              <span>Nome</span>
+              <input
+                value={perfil.nome}
+                onChange={(e) =>
+                  atualizarCampoPerfil(
+                    "nome",
+                    e.target.value
+                  )
+                }
+                placeholder="Seu nome"
+              />
+            </label>
+
+            <label>
+              <span>Função na Papiro</span>
+              <input
+                value={perfil.funcao}
+                onChange={(e) =>
+                  atualizarCampoPerfil(
+                    "funcao",
+                    e.target.value
+                  )
+                }
+                placeholder="Ex: Social Media, Financeiro..."
+              />
+            </label>
+
+            <label>
+              <span>WhatsApp</span>
+              <input
+                value={perfil.whatsapp}
+                onChange={(e) =>
+                  atualizarCampoPerfil(
+                    "whatsapp",
+                    e.target.value
+                  )
+                }
+                placeholder="(12) 99999-9999"
+              />
+            </label>
+
+            <label>
+              <span>Aniversário</span>
+              <input
+                type="date"
+                value={perfil.aniversario}
+                onChange={(e) =>
+                  atualizarCampoPerfil(
+                    "aniversario",
+                    e.target.value
+                  )
+                }
+              />
+            </label>
+          </div>
+
+          <label className="profile-full-field">
+            <span>Sobre você</span>
+            <textarea
+              value={perfil.bio}
+              onChange={(e) =>
+                atualizarCampoPerfil(
+                  "bio",
+                  e.target.value
+                )
+              }
+              placeholder="Conte um pouco sobre você e sua participação na Papiro..."
+            />
+          </label>
+
+          <label className="profile-full-field">
+            <span>Áreas de responsabilidade</span>
+            <textarea
+              value={perfil.responsabilidades}
+              onChange={(e) =>
+                atualizarCampoPerfil(
+                  "responsabilidades",
+                  e.target.value
+                )
+              }
+              placeholder="Ex: atendimento, estoque, criação de conteúdo..."
+            />
+          </label>
+
+          {perfilMensagem && (
+            <p
+              className={`profile-message ${
+                perfilMensagem.includes("sucesso")
+                  ? "success"
+                  : "error"
+              }`}
+            >
+              {perfilMensagem}
+            </p>
+          )}
+
+          <div className="profile-form-actions">
+            <p>
+              O e-mail de acesso é protegido e não
+              pode ser alterado por aqui.
+            </p>
+
+            <button
+              type="submit"
+              disabled={perfilSalvando}
+            >
+              {perfilSalvando
+                ? "Salvando..."
+                : "Salvar meu perfil"}
+            </button>
+          </div>
+        </form>
+      </div>
+    )}
   </>
 )}
 
@@ -2201,13 +2959,42 @@ function Metric({
   value,
   icon,
   destaque = false,
+  onClick,
+  hint,
 }) {
+  const className = `metric ${
+    destaque ? "metric-alert" : ""
+  } ${onClick ? "metric-clickable" : ""}`;
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        className={className}
+        onClick={onClick}
+        title={hint}
+      >
+        <div className="metric-top">
+          <span>{label}</span>
+
+          {icon && (
+            <span className="metric-icon">
+              {icon}
+            </span>
+          )}
+        </div>
+
+        <strong>{value}</strong>
+
+        <small className="metric-link">
+          {hint || "Abrir"} →
+        </small>
+      </button>
+    );
+  }
+
   return (
-    <article
-      className={`metric ${
-        destaque ? "metric-alert" : ""
-      }`}
-    >
+    <article className={className}>
       <div className="metric-top">
         <span>{label}</span>
 
@@ -2219,13 +3006,10 @@ function Metric({
       </div>
 
       <strong>{value}</strong>
-
-      {destaque && (
-        <small>Itens que precisam de atenção</small>
-      )}
     </article>
   );
 }
+
 function Card({ title, text, children }) {
   return <article className="card"><h3>{title}</h3><p>{text}</p>{children}</article>;
 }
